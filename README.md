@@ -11,7 +11,7 @@ bigReals has been tested on Linux, but should compile and work fine in Windows o
 
     $ sudo apt-get install libgmp-dev
 
-While a npm is created, you can install bigReals cloning from github:
+While a npm package is created, you can install bigReals cloning from github:
 
     $ mkdir -p node_modules/bigReals
     $ cd node_modules/bigReals
@@ -22,7 +22,7 @@ Testing
 -------
 A complete battery of tests is included under directory test. To run all tests, execute npm test:
 
-    $ npm TestName
+    $ npm test
 
 To run a specific test, execute it with node:
 
