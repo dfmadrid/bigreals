@@ -3,7 +3,7 @@ bigReals
 
 node.js native c/c++ addon using [gmp](http://gmplib.org/) and [mpfr](http://www.mpfr.org/) to perform fast, infinite precision, loop-optimized calculations and bit manipulations over big integers, big rationals and big floating point numbers.
 
-bigReals is the addon used by [cryptatoo](https://github.com/dfmadrid/bigreals) to perform cryptographic analysis and attacks over large numbers like RSA keys of 1024 bits. bigReals is a work in progress, currently only big integer support is fully operational.
+bigReals is the addon used by [cryptatoo](https://github.com/dfmadrid/cryptatoo) to perform cryptographic analysis and attacks over large numbers like RSA keys of 1024 bits. bigReals is a work in progress, currently only big integer support is fully operational.
 
 Installation
 ------------
