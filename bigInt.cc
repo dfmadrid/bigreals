@@ -104,7 +104,7 @@ Handle<Value> bigInt::New(const Arguments& args) {
 		ThrowException(Exception::TypeError(String::New("Argument must be an integer, a string or a bigint")));
 		return scope.Close(Undefined());
 		}
-	
+
 	obj->Wrap(args.This());
 
   return args.This();
@@ -157,7 +157,7 @@ Handle<Value> bigInt::add(const Arguments& args) {
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
   mpz_t *res = (mpz_t *) malloc(sizeof(mpz_t));
 	mpz_init(*res);
-	
+
 
 	if(args[0]->IsNumber()){
 		mpz_add_ui(*res, *obj->gmpInt_, args[0]->ToInteger()->Value());
@@ -190,7 +190,7 @@ Handle<Value> bigInt::sub(const Arguments& args) {
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
   mpz_t *res = (mpz_t *) malloc(sizeof(mpz_t));
 	mpz_init(*res);
-	
+
 	if(args[0]->IsNumber()){
 		mpz_sub_ui(*res, *obj->gmpInt_, args[0]->ToInteger()->Value());
 		}
@@ -222,7 +222,7 @@ Handle<Value> bigInt::mul(const Arguments& args) {
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
   mpz_t *res = (mpz_t *) malloc(sizeof(mpz_t));
 	mpz_init(*res);
-	
+
 	if(args[0]->IsNumber()){
 		mpz_mul_ui(*res, *obj->gmpInt_, args[0]->ToInteger()->Value());
 		}
@@ -234,7 +234,7 @@ Handle<Value> bigInt::mul(const Arguments& args) {
 		ThrowException(Exception::TypeError(String::New("Argument 1 must an integer or a bigint")));
 		return scope.Close(Undefined());
 		}
-	
+
 	if(args.Length() > 1){
 		Handle<Value> arg[1] = { External::New(modRes(res, args[1])) };
 		result = constructor->NewInstance(1, arg);
@@ -285,7 +285,7 @@ Handle<Value> bigInt::accMul(const Arguments& args) {
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
   mpz_t *res = (mpz_t *) malloc(sizeof(mpz_t));
 	mpz_init(*res);
-		
+
 	if(args[0]->IsObject()){
 		bigInt* obj2 = ObjectWrap::Unwrap<bigInt>(args[0]->ToObject());
 		mpz_mul(*res, *obj->gmpInt_, *obj2->gmpInt_);
@@ -601,7 +601,7 @@ Handle<Value> bigInt::root(const Arguments& args) {
 		ThrowException(Exception::TypeError(String::New("Arguments 1 and 2 must be an integer and a bigint or a bigint and an integer")));
 		return scope.Close(Undefined());
 		}
-			
+
 	if(args.Length() > 1 && args[0]->IsNumber()){
 		Handle<Value> arg[1] = { External::New(modRes(res, args[1])) };
 		result = constructor->NewInstance(1, arg);
@@ -614,7 +614,7 @@ Handle<Value> bigInt::root(const Arguments& args) {
 		Handle<Value> arg[1] = { External::New(*res) };		
 		result = constructor->NewInstance(1, arg);
 		}	
-				
+
   return scope.Close(result);
 }
 
@@ -653,7 +653,7 @@ Handle<Value> bigInt::div(const Arguments& args) {
   bigInt *dividend = ObjectWrap::Unwrap<bigInt>(args.This());
   mpz_t *quotient = (mpz_t *) malloc(sizeof(mpz_t));
 	mpz_init(*quotient);
-	
+
 	if(args.Length() == 1 && args[0]->IsNumber()){
 		mpz_div_ui(*quotient, *dividend->gmpInt_, args[0]->ToInteger()->Value());
 		}
@@ -679,7 +679,7 @@ Handle<Value> bigInt::div(const Arguments& args) {
 		ThrowException(Exception::TypeError(String::New("Argument 1 must be an integer or a bigint followed by a bigint")));
 		return scope.Close(Undefined());
 		}
-	
+
 	if(args.Length() > 2){	
 		Handle<Value> arg[1] = { External::New(modRes(quotient, args[2])) };
 		result = constructor->NewInstance(1, arg);
@@ -706,6 +706,6 @@ mpz_t * bigInt::modRes(mpz_t * res, Local<Value> modulus){
 	else{
 		ThrowException(Exception::TypeError(String::New("Modulus must be an integer or a bigint")));
 		}
-		
+
 	return modRes;
 }
