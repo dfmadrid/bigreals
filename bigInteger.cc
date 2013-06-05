@@ -16,7 +16,7 @@ void InitAll(Handle<Object> exports, Handle<Object> module) {
   bigInt::Init();
 
   module->Set(String::NewSymbol("exports"),
-      FunctionTemplate::New(bigInteger)->GetFunction());
+    FunctionTemplate::New(bigInteger)->GetFunction());
 
 }
 
