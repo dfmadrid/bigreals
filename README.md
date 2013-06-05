@@ -13,9 +13,9 @@ bigReals has been tested on Linux, but should compile and work fine in Windows o
 
 While a npm package is created, you can install bigReals cloning from github:
 
-    $ mkdir -p node_modules/bigReals
-    $ cd node_modules/bigReals
+    $ cd node_modules
     $ git clone git://github.com/dfmadrid/bigreals.git
+    $ cd bigreals
     $ npm install
 
 Testing
@@ -36,7 +36,7 @@ Examples
 --------
 Normal and modular arithmetics:
 
-    var bigReal = require('bigReals');
+    var bigReal = require('bigreals');
     
     var op1 = bigReal(20);
     var op2 = bigReal(30);
@@ -47,7 +47,7 @@ Normal and modular arithmetics:
 
 Integer roots with or without remainder:
 
-    var bigReal = require('bigReals');
+    var bigReal = require('bigreals');
     
     var op = bigReal(30);
     var mod = bigReal(3);
@@ -58,7 +58,7 @@ Integer roots with or without remainder:
 
 Hash table creation and lookup using special loop-optimized functions:
 
-    var bigReal = require('bigReals');
+    var bigReal = require('bigreals');
     
     var op1 = bigReal(20);
     var op2 = bigReal(30);
