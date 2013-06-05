@@ -29,8 +29,8 @@ class bigInt : public node::ObjectWrap {
 		static v8::Handle<v8::Value> exor(const v8::Arguments& args);
 		static v8::Handle<v8::Value> bitAnd(const v8::Arguments& args);
 		static v8::Handle<v8::Value> bitOr(const v8::Arguments& args);
-		static v8::Handle<v8::Value> hamDist(const v8::Arguments& args);
 		static v8::Handle<v8::Value> population(const v8::Arguments& args);
+		static v8::Handle<v8::Value> hamDist(const v8::Arguments& args);
 		static v8::Handle<v8::Value> lShift(const v8::Arguments& args);
 		static v8::Handle<v8::Value> rShift(const v8::Arguments& args);
 		static v8::Handle<v8::Value> cmp(const v8::Arguments& args);
