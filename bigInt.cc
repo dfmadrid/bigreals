@@ -12,7 +12,7 @@ using namespace v8;
 bigInt::bigInt() {};
 bigInt::~bigInt(){
   mpz_clear(*gmpInt_);
-  free(gmpInt_);
+  delete(gmpInt_);
 };
 
 Persistent<Function> bigInt::constructor;
@@ -75,7 +75,7 @@ void bigInt::Init() {
 Handle<Value> bigInt::New(const Arguments& args) {
   HandleScope scope;
   bigInt *obj = new bigInt();
-  obj->gmpInt_ = (mpz_t *) malloc(sizeof(mpz_t));
+  obj->gmpInt_ = new mpz_t[1];
   mpz_init(*obj->gmpInt_);
   int base = 10;
 
@@ -149,9 +149,9 @@ Handle<Value> bigInt::toString(const Arguments& args) {
 
 Handle<Value> bigInt::add(const Arguments& args) {
   HandleScope scope;
-  Handle<Value> result;
+  Local<Object> result;
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
-  mpz_t *res = (mpz_t *) malloc(sizeof(mpz_t));
+  mpz_t * res = new mpz_t[1];
   mpz_init(*res);
 
   if(args[0]->IsNumber()){
@@ -180,11 +180,11 @@ Handle<Value> bigInt::add(const Arguments& args) {
 
 Handle<Value> bigInt::sub(const Arguments& args) {
   HandleScope scope;
-  Handle<Value> result;
+  Local<Object> result;
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
-  mpz_t *res = (mpz_t *) malloc(sizeof(mpz_t));
+  mpz_t * res = new mpz_t[1];
   mpz_init(*res);
-
+  
   if(args[0]->IsNumber()){
     mpz_sub_ui(*res, *obj->gmpInt_, args[0]->ToInteger()->Value());
   }
@@ -211,9 +211,9 @@ Handle<Value> bigInt::sub(const Arguments& args) {
 
 Handle<Value> bigInt::mul(const Arguments& args) {
   HandleScope scope;
-  Handle<Value> result;
+  Local<Object> result;
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
-  mpz_t *res = (mpz_t *) malloc(sizeof(mpz_t));
+  mpz_t * res = new mpz_t[1];
   mpz_init(*res);
 
   if(args[0]->IsNumber()){
@@ -274,7 +274,7 @@ Handle<Value> bigInt::addMul(const Arguments& args) {
 Handle<Value> bigInt::accMul(const Arguments& args) {
   HandleScope scope;
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
-  mpz_t *res = (mpz_t *) malloc(sizeof(mpz_t));
+  mpz_t * res = new mpz_t[1];
   mpz_init(*res);
 
   if(args[0]->IsObject()){
@@ -332,9 +332,9 @@ Handle<Value> bigInt::subMul(const Arguments& args) {
 
 Handle<Value> bigInt::exor(const Arguments& args) {
   HandleScope scope;
-  Handle<Value> result;
+  Local<Object> result;
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
-  mpz_t *res = (mpz_t *) malloc(sizeof(mpz_t));
+  mpz_t * res = new mpz_t[1];	
   mpz_init(*res);
 
   if(args.Length() > 0 && args[0]->IsObject()){
@@ -360,9 +360,9 @@ Handle<Value> bigInt::exor(const Arguments& args) {
 
 Handle<Value> bigInt::lShift(const Arguments& args) {
   HandleScope scope;
-  Handle<Value> result;
+  Local<Object> result;
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
-  mpz_t *res = (mpz_t *) malloc(sizeof(mpz_t));
+  mpz_t * res = new mpz_t[1];	
   mpz_init(*res);
 
   if(args.Length() > 0 && args[0]->IsNumber()){
@@ -387,9 +387,9 @@ Handle<Value> bigInt::lShift(const Arguments& args) {
 
 Handle<Value> bigInt::rShift(const Arguments& args) {
   HandleScope scope;
-  Handle<Value> result;
+  Local<Object> result;
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
-  mpz_t *res = (mpz_t *) malloc(sizeof(mpz_t));
+  mpz_t * res = new mpz_t[1];	
   mpz_init(*res);
 
   if(args.Length() > 0 && args[0]->IsNumber()){
@@ -414,9 +414,9 @@ Handle<Value> bigInt::rShift(const Arguments& args) {
 
 Handle<Value> bigInt::bitAnd(const Arguments& args) {
   HandleScope scope;
-  Handle<Value> result;
+  Local<Object> result;
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
-  mpz_t *res = (mpz_t *) malloc(sizeof(mpz_t));
+  mpz_t * res = new mpz_t[1];	
   mpz_init(*res);
 
   if(args.Length() > 0 && args[0]->IsObject()){
@@ -442,14 +442,15 @@ Handle<Value> bigInt::bitAnd(const Arguments& args) {
 
 Handle<Value> bigInt::bitOr(const Arguments& args) {
   HandleScope scope;
-  Handle<Value> result;
+  Local<Object> result;
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
-  mpz_t *res = (mpz_t *) malloc(sizeof(mpz_t));
+  mpz_t * res = new mpz_t[1];	
   mpz_init(*res);
 
   if(args.Length() > 0 && args[0]->IsObject()){
     bigInt* obj2 = ObjectWrap::Unwrap<bigInt>(args[0]->ToObject());
     mpz_ior(*res, *obj->gmpInt_, *obj2->gmpInt_);
+
   }
   else{
     ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigint")));
@@ -513,9 +514,9 @@ Handle<Value> bigInt::cmp(const Arguments& args) {
 
 Handle<Value> bigInt::pow(const Arguments& args) {
   HandleScope scope;
-  Handle<Value> result;
+  Local<Object> result;
   bigInt *base = ObjectWrap::Unwrap<bigInt>(args.This());
-  mpz_t *res = (mpz_t *) malloc(sizeof(mpz_t));
+  mpz_t * res = new mpz_t[1];	
   mpz_init(*res);
 
   if(args[0]->IsNumber()){
@@ -563,9 +564,9 @@ Handle<Value> bigInt::isOdd(const Arguments& args) {
 
 Handle<Value> bigInt::root(const Arguments& args) {
   HandleScope scope;
-  Handle<Value> result;
+  Local<Object> result;
   bigInt *base = ObjectWrap::Unwrap<bigInt>(args.This());
-  mpz_t *res = (mpz_t *) malloc(sizeof(mpz_t));
+  mpz_t * res = new mpz_t[1];
   mpz_init(*res);
 
   if(args[0]->IsNumber()){
@@ -597,9 +598,9 @@ Handle<Value> bigInt::root(const Arguments& args) {
 }
 
 Handle<Value> bigInt::invert(const Arguments& args) {
-  HandleScope scope;
+    HandleScope scope;
   bigInt *base = ObjectWrap::Unwrap<bigInt>(args.This());
-  mpz_t *res = (mpz_t *) malloc(sizeof(mpz_t));
+  mpz_t * res = new mpz_t[1];	
   mpz_init(*res);
 
   if(args.Length() > 0 && args[0]->IsObject()){
@@ -607,7 +608,7 @@ Handle<Value> bigInt::invert(const Arguments& args) {
     mpz_invert(*res, *base->gmpInt_, *modulus->gmpInt_);
   }
   else if(args.Length() >0 && args[0]->IsNumber()){
-    mpz_t *modulus = (mpz_t *) malloc(sizeof(mpz_t));
+    mpz_t *modulus = new mpz_t[1];
     mpz_init(*modulus);
     mpz_set_ui(*modulus, args[0]->ToInteger()->Value());
     mpz_invert(*res, *base->gmpInt_, *modulus);
@@ -625,9 +626,9 @@ Handle<Value> bigInt::invert(const Arguments& args) {
 
 Handle<Value> bigInt::div(const Arguments& args) {
   HandleScope scope;
-  Handle<Value> result;
+  Local<Object> result;
   bigInt *dividend = ObjectWrap::Unwrap<bigInt>(args.This());
-  mpz_t *quotient = (mpz_t *) malloc(sizeof(mpz_t));
+  mpz_t * quotient = new mpz_t[1];	
   mpz_init(*quotient);
 
   if(args.Length() == 1 && args[0]->IsNumber()){
@@ -670,18 +671,57 @@ Handle<Value> bigInt::div(const Arguments& args) {
 
 mpz_t * bigInt::modRes(mpz_t * res, Local<Value> modulus){
 
-  mpz_t *modRes = (mpz_t *) malloc(sizeof(mpz_t));
-  mpz_init(*modRes);
+  mpz_t * resMod = new mpz_t[1];	
+  mpz_init(*resMod);
   if(modulus->IsObject()){
     bigInt* modObj = ObjectWrap::Unwrap<bigInt>(modulus->ToObject());
-    mpz_mod(*modRes, *res, *modObj->gmpInt_); 
+    mpz_mod(*resMod, *res, *modObj->gmpInt_); 
   }
   else if(modulus->IsNumber()){
-    mpz_mod_ui(*modRes, *res, modulus->ToInteger()->Value());
+    mpz_mod_ui(*resMod, *res, modulus->ToInteger()->Value());
   }
   else{
     ThrowException(Exception::TypeError(String::New("Modulus must be an integer or a bigint")));
   }
 
-  return modRes;
+  return resMod;
 }
+
+char bigInt::checkArgs(const v8::Arguments& args){
+
+  short int length = args.Length();
+  short int ctr = 0;
+  char argsType = 0;
+
+  while(ctr < length){
+    
+    if(args[ctr]->IsUndefined()){
+      argsType = argsType && 1;
+    }
+    if(args[ctr]->IsInt32()){i
+      argsType = argsType && (1 << 1);
+    }
+    if(args[ctr]->IsUint32()){
+      argsType = argsType && (1 << 2);
+    }
+
+    if(args[ctr]->IsExternal()){
+      argsType = argsType && (1 << 3);
+    }
+
+    if(args[ctr]->IsNumber()){
+      argsType = argsType && (1 << 4);
+    }
+    if(args[ctr]->IsString()){
+      argsType = argsType && (1 << 5);
+    }
+    
+    if(args[ctr]->IsObject()){
+      argsType = argsType && (1 << 6);
+    }
+    ctr++;
+  }
+  
+  return argsType;
+}
+    
