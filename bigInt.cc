@@ -2,7 +2,6 @@
 #define BUILDING_NODE_EXTENSION
 #endif
 
-#include <cstdlib>
 #include <node.h>
 #include <gmp.h>
 #include "bigInt.h"
@@ -509,6 +508,7 @@ Handle<Value> bigInt::bitAnd(const Arguments& args) {
  * Accepts as main argument a biginteger object and
  * optionally a uint64 or biginteger modulus.
  */
+
 Handle<Value> bigInt::bitOr(const Arguments& args) {
   HandleScope scope;
   Local<Object> result;
