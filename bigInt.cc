@@ -143,7 +143,7 @@ Handle<Value> bigInt::toString(const Arguments& args) {
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
   int base = 10;
   
-  if(args[0]->IsString()){
+  if(args[0]->IsInt32()){
     base = args[0]->ToInt32()->Value();
     if(base < 2 || base > 62) {
       ThrowException(Exception::Error(String::New("Base must be >= 2 and <= 62. If empty, default is 10")));
