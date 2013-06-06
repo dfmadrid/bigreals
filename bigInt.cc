@@ -18,11 +18,11 @@ bigInt::~bigInt(){
 Persistent<Function> bigInt::constructor;
 
 void bigInt::Init() {
-  // Prepare constructor template
+  // Constructor template
   Local<FunctionTemplate> tpl = FunctionTemplate::New(New);
   tpl->SetClassName(String::NewSymbol("bigInt"));
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
-  // Prototype
+  // Javascript Prototype of object,
   tpl->PrototypeTemplate()->Set(String::NewSymbol("inspect"),
     FunctionTemplate::New(inspect)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("toString"),
@@ -72,6 +72,11 @@ void bigInt::Init() {
 
 }
 
+/* Constructor.
+ * Accepts a uint64 number, a string in a provided base or a GMP integer.
+ * If no argument is provided, instantiates the object to a biginteger with value 0.
+ */
+
 Handle<Value> bigInt::New(const Arguments& args) {
   HandleScope scope;
   bigInt *obj = new bigInt();
@@ -100,7 +105,7 @@ Handle<Value> bigInt::New(const Arguments& args) {
     obj->gmpInt_ = (mpz_t *) External::Unwrap(args[0]);
   }
   else{
-    ThrowException(Exception::TypeError(String::New("Argument must be an integer, a string or a bigint")));
+    ThrowException(Exception::TypeError(String::New("Argument must be an integer or a string.")));
     return scope.Close(Undefined());
   }
 
@@ -118,7 +123,7 @@ Handle<Value> bigInt::NewInstance(const Arguments& args) {
   return scope.Close(instance);
 }
 
-// Returns a string when object is inspected by console.log()
+// Returns a string when object is inspected by console.log().
 
 Handle<Value> bigInt::inspect(const Arguments& args) {
   HandleScope scope;
@@ -130,9 +135,8 @@ Handle<Value> bigInt::inspect(const Arguments& args) {
 }
 
 /* Returns a string representing the bigInteger.
- * An optional base of the string representation could be provided.
- * argsType == 0 -> No arguments
- * argsType == 2 -> Unsigned int argument
+ * An optional base to convert the string to could be optionally provided.
+ * Accepts no arguments or a int32 >= 2 and <=62.
  */
 
 Handle<Value> bigInt::toString(const Arguments& args) {
@@ -154,6 +158,12 @@ Handle<Value> bigInt::toString(const Arguments& args) {
 
   return scope.Close(String::New(mpz_get_str(0, base, *obj->gmpInt_)));
 }
+
+
+/* Addition, normal or modular.
+ * Accepts as main argument a uint64 or a biginteger object and
+ * optionally a uint64 or biginteger modulus for modular addition.
+ */
 
 Handle<Value> bigInt::add(const Arguments& args) {
   HandleScope scope;
@@ -186,6 +196,11 @@ Handle<Value> bigInt::add(const Arguments& args) {
   return scope.Close(result);
 }
 
+/* Substraction, normal or modular.
+ * Accepts as main argument a uint64 or a biginteger object and
+ * optionally a uint64 or biginteger modulus for modular substraction.
+ */
+
 Handle<Value> bigInt::sub(const Arguments& args) {
   HandleScope scope;
   Local<Object> result;
@@ -216,6 +231,11 @@ Handle<Value> bigInt::sub(const Arguments& args) {
 
   return scope.Close(result);
 }
+
+/* Multiplication, normal or modular.
+ * Accepts as main argument a uint64 or a biginteger object and
+ * optionally a uint64 or biginteger modulus for modular multiplication.
+ */
 
 Handle<Value> bigInt::mul(const Arguments& args) {
   HandleScope scope;
@@ -248,6 +268,12 @@ Handle<Value> bigInt::mul(const Arguments& args) {
   return scope.Close(result);
 }
 
+/* Combined operation equivalent to op1 = op1 + op2 * op3.
+ * Accepts as main argument a biginteger object and a second argument that
+ * might be a uint64 or a biginteger object. Optinonally accepts a
+ * a uint64 or biginteger object modulus for modular addition.
+ */
+
 Handle<Value> bigInt::addMul(const Arguments& args) {
   HandleScope scope;
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
@@ -279,6 +305,11 @@ Handle<Value> bigInt::addMul(const Arguments& args) {
   return scope.Close(args.This());
 }
 
+/* Combined operation equivalent to op1 = op1 * op2.
+ * Accepts as main argument a uint64 or a biginteger object and
+ * optionally a uint64 or biginteger object modulus for modular multiplication.
+ */
+
 Handle<Value> bigInt::accMul(const Arguments& args) {
   HandleScope scope;
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
@@ -306,6 +337,12 @@ Handle<Value> bigInt::accMul(const Arguments& args) {
 
   return scope.Close(args.This());
 }
+
+/* Combined operation equivalent to op1 = op1 - op2 * op3.
+ * Accepts as main argument a biginteger object and a second
+ * argument that might be a uint64 or a biginteger object.
+ * Optionally accepts a uint64 or biginteger object modulus for modular substraction.
+ */
 
 Handle<Value> bigInt::subMul(const Arguments& args) {
   HandleScope scope;
@@ -338,6 +375,11 @@ Handle<Value> bigInt::subMul(const Arguments& args) {
   return scope.Close(args.This());
 }
 
+/* Exclusive XOR.
+ * Accepts as main argument a biginteger object and
+ * optionally a uint64 or biginteger modulus for modular XOR
+ */
+
 Handle<Value> bigInt::exor(const Arguments& args) {
   HandleScope scope;
   Local<Object> result;
@@ -366,6 +408,11 @@ Handle<Value> bigInt::exor(const Arguments& args) {
   return scope.Close(result);
 }
 
+/* Multiplication by 2 ^ n aka Left Shift.
+ * Accepts as main argument a uint64 and
+ * optionally a uint64 or biginteger modulus for modular multiplication.
+ */
+
 Handle<Value> bigInt::lShift(const Arguments& args) {
   HandleScope scope;
   Local<Object> result;
@@ -393,6 +440,11 @@ Handle<Value> bigInt::lShift(const Arguments& args) {
   return scope.Close(result);
 }
 
+/* Division by 2 ^ n aka Right Shift.
+ * Accepts as main argument a uint64 and
+ * optionally a uint64 or biginteger modulus for modular division.
+ */
+
 Handle<Value> bigInt::rShift(const Arguments& args) {
   HandleScope scope;
   Local<Object> result;
@@ -419,6 +471,11 @@ Handle<Value> bigInt::rShift(const Arguments& args) {
 
   return scope.Close(result);
 }
+
+/* Bit AND operation.
+ * Accepts as main argument a biginteger object and
+ * optionally a uint64 or biginteger modulus for modular result
+ */
 
 Handle<Value> bigInt::bitAnd(const Arguments& args) {
   HandleScope scope;
@@ -448,6 +505,10 @@ Handle<Value> bigInt::bitAnd(const Arguments& args) {
   return scope.Close(result);
 }
 
+/* Inclusive OR.
+ * Accepts as main argument a biginteger object and
+ * optionally a uint64 or biginteger modulus.
+ */
 Handle<Value> bigInt::bitOr(const Arguments& args) {
   HandleScope scope;
   Local<Object> result;
@@ -477,6 +538,11 @@ Handle<Value> bigInt::bitOr(const Arguments& args) {
   return scope.Close(result);
 }
 
+/* Hamming distance between 2 biginteger objects.
+ * Accepts as main argument a biginteger object to compare with.
+ * Returns the number of bit positions in the 2 biginteger objects with a different value
+ */
+
 Handle<Value> bigInt::hamDist(const Arguments& args) {
   HandleScope scope;
   unsigned long int distance = 0;
@@ -494,6 +560,11 @@ Handle<Value> bigInt::hamDist(const Arguments& args) {
   return scope.Close(Number::New(distance));
 }
 
+/* Population of biginteger object bits.
+ * Called with no arguments.
+ * Returns number of bits set to 1 in object
+ */
+
 Handle<Value> bigInt::population(const Arguments& args) {
   HandleScope scope;
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
@@ -502,6 +573,11 @@ Handle<Value> bigInt::population(const Arguments& args) {
 
   return scope.Close(Number::New(population));
 }
+
+/* Compares 2 biginteger objects.
+ * Accepts as main argument a biginteger object.
+ * Returns > 0 if argument is smaller than original object, 0 if equal or <0 if bigger.
+ */
 
 Handle<Value> bigInt::cmp(const Arguments& args) {
   HandleScope scope;
@@ -519,6 +595,11 @@ Handle<Value> bigInt::cmp(const Arguments& args) {
 
   return scope.Close(Number::New(result));
 }
+
+/* Exponentiation, normal or modular.
+ * Accepts as exponent a uint64 or a biginteger object and
+ * optionally a uint64 or biginteger modulus.
+ */
 
 Handle<Value> bigInt::pow(const Arguments& args) {
   HandleScope scope;
@@ -552,6 +633,8 @@ Handle<Value> bigInt::pow(const Arguments& args) {
   return scope.Close(result);
 }
 
+/* Returns cero if biginteger object is even */
+
 Handle<Value> bigInt::isEven(const Arguments& args) {
   HandleScope scope;
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
@@ -561,6 +644,8 @@ Handle<Value> bigInt::isEven(const Arguments& args) {
   return scope.Close(Number::New(isEven));
 }
 
+/* Returns positive if biginteger object is odd */
+
 Handle<Value> bigInt::isOdd(const Arguments& args) {
   HandleScope scope;
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
@@ -569,6 +654,12 @@ Handle<Value> bigInt::isOdd(const Arguments& args) {
 
   return scope.Close(Number::New(isOdd));
 }
+
+/* n-th root with or without remainder,  normal or modular.
+ * Accepts as exponent a uint64 and optionally a modulus.
+ * If first argument is a biginteger object, it will be used to store the n-th remainder of root.
+ * Optionally accepts a uint64 or biginteger object for modular n-th roots.
+ */
 
 Handle<Value> bigInt::root(const Arguments& args) {
   HandleScope scope;
@@ -605,6 +696,10 @@ Handle<Value> bigInt::root(const Arguments& args) {
   return scope.Close(result);
 }
 
+/* Modular inversion
+ * Accepts a uint64 or a biginteger modulus.
+ */
+
 Handle<Value> bigInt::invert(const Arguments& args) {
     HandleScope scope;
   bigInt *base = ObjectWrap::Unwrap<bigInt>(args.This());
@@ -631,6 +726,13 @@ Handle<Value> bigInt::invert(const Arguments& args) {
 
   return scope.Close(result);
 }
+
+/* Division with or without remainder, normal or modular.
+ * Accepts as divisor a uint64 and optionally a modulus.
+ * If first argument is a biginteger object, it will be used to store remainder of calculation
+ * and second argument must be a uint64 or a biginteger object divisor. 
+ * Optionally a uint64 or biginteger modulus is accepted for modular division.
+ */
 
 Handle<Value> bigInt::div(const Arguments& args) {
   HandleScope scope;
@@ -676,6 +778,11 @@ Handle<Value> bigInt::div(const Arguments& args) {
 
   return scope.Close(result);
 }
+
+/* Private function to calculate modular result of a previous operation
+ * Accepts a uint64 or a biginteger modulus.
+ * Returns result of calculation mod modulus as a GMP integer.
+ */
 
 mpz_t * bigInt::modRes(mpz_t * res, Local<Value> modulus){
 
