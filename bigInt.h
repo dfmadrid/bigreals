@@ -41,7 +41,7 @@ class bigInt : public node::ObjectWrap {
 		static v8::Handle<v8::Value> invert(const v8::Arguments& args);
 		static v8::Handle<v8::Value> div(const v8::Arguments& args);
 		static mpz_t * modRes(mpz_t * res, v8::Local<v8::Value> modulus);
-		static char checkArgs(const v8::Arguments& args);
+		
 };
 
 #endif

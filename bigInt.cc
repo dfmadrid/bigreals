@@ -87,7 +87,7 @@ Handle<Value> bigInt::New(const Arguments& args) {
   }	
   else if(args[0]->IsString()){
     if(args.Length() > 1 && args[1]->IsNumber()){
-      base = args[1]->ToInteger()->Value();
+      base = args[1]->ToInt32()->Value();
       if(base < 2 || base > 62) {
         ThrowException(Exception::Error(String::New("Base two must be >= 2 and <= 62. If empty, default is 10")));
         return scope.Close(Undefined());
@@ -118,6 +118,8 @@ Handle<Value> bigInt::NewInstance(const Arguments& args) {
   return scope.Close(instance);
 }
 
+// Returns a string when object is inspected by console.log()
+
 Handle<Value> bigInt::inspect(const Arguments& args) {
   HandleScope scope;
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
@@ -127,20 +129,26 @@ Handle<Value> bigInt::inspect(const Arguments& args) {
   return scope.Close(String::Concat(type, String::New(">")));
 }
 
+/* Returns a string representing the bigInteger.
+ * An optional base of the string representation could be provided.
+ * argsType == 0 -> No arguments
+ * argsType == 2 -> Unsigned int argument
+ */
+
 Handle<Value> bigInt::toString(const Arguments& args) {
   HandleScope scope;
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
   int base = 10;
-
-  if(args[0]->IsNumber()){
-    base = args[0]->ToInteger()->Value();
+  
+  if(args[0]->IsString()){
+    base = args[0]->ToInt32()->Value();
     if(base < 2 || base > 62) {
       ThrowException(Exception::Error(String::New("Base must be >= 2 and <= 62. If empty, default is 10")));
       return scope.Close(Undefined());
     }
   }
   else if(args.Length() > 0){
-    ThrowException(Exception::TypeError(String::New("Base must be an integer")));
+    ThrowException(Exception::TypeError(String::New("Base must be a positive integer")));
     return scope.Close(Undefined()); 
   }
 
@@ -153,7 +161,7 @@ Handle<Value> bigInt::add(const Arguments& args) {
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
   mpz_t * res = new mpz_t[1];
   mpz_init(*res);
-
+  
   if(args[0]->IsNumber()){
     mpz_add_ui(*res, *obj->gmpInt_, args[0]->ToInteger()->Value());
   }
@@ -687,41 +695,4 @@ mpz_t * bigInt::modRes(mpz_t * res, Local<Value> modulus){
   return resMod;
 }
 
-char bigInt::checkArgs(const v8::Arguments& args){
-
-  short int length = args.Length();
-  short int ctr = 0;
-  char argsType = 0;
-
-  while(ctr < length){
-    
-    if(args[ctr]->IsUndefined()){
-      argsType = argsType && 1;
-    }
-    if(args[ctr]->IsInt32()){i
-      argsType = argsType && (1 << 1);
-    }
-    if(args[ctr]->IsUint32()){
-      argsType = argsType && (1 << 2);
-    }
-
-    if(args[ctr]->IsExternal()){
-      argsType = argsType && (1 << 3);
-    }
-
-    if(args[ctr]->IsNumber()){
-      argsType = argsType && (1 << 4);
-    }
-    if(args[ctr]->IsString()){
-      argsType = argsType && (1 << 5);
-    }
-    
-    if(args[ctr]->IsObject()){
-      argsType = argsType && (1 << 6);
-    }
-    ctr++;
-  }
-  
-  return argsType;
-}
     
