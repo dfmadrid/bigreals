@@ -8,7 +8,7 @@
           {
             'link_settings': {
               'libraries': [
-                '-lgmp'
+                '-lmpfr -lgmp'
               ]
             }
           }
@@ -17,7 +17,7 @@
           {
             'link_settings': {
               'libraries': [
-                '-lgmp'
+                '-lmpfr -lgmp'
               ]
             }
           }
@@ -26,7 +26,7 @@
           {
             'link_settings': {
               'libraries': [
-                '-lgmp.lib'
+                '-lmpfr.lib -lgmp.lib'
               ],
             }
           }
