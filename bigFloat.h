@@ -8,12 +8,17 @@
 #include <gmp.h>
 #include <mpfr.h>
 
+class config {
+	public:
+		config(mpfr_prec_t precision, mpfr_rnd_t rMode) : precision_(precision), rMode_(rMode) { }
+		mpfr_prec_t precision_;
+		mpfr_rnd_t rMode_;
+};
+
 class bigFloat : public node::ObjectWrap {
 	public:
-		static void Init();
+		static void Init(v8::Handle<v8::Value> precision, v8::Handle<v8::Value> rMode);
 		static v8::Handle<v8::Value> NewInstance(const v8::Arguments& args);
-		mpfr_t *mpFloat_;
-
 	private:
 		bigFloat();
 		~bigFloat();
@@ -21,28 +26,12 @@ class bigFloat : public node::ObjectWrap {
 		static v8::Handle<v8::Value> New(const v8::Arguments& args);
 		static v8::Handle<v8::Value> inspect(const v8::Arguments& args);
 		static v8::Handle<v8::Value> toString(const v8::Arguments& args);
-		static v8::Handle<v8::Value> add(const v8::Arguments& args);
-		static v8::Handle<v8::Value> sub(const v8::Arguments& args);
-		static v8::Handle<v8::Value> mul(const v8::Arguments& args);
-		static v8::Handle<v8::Value> addMul(const v8::Arguments& args);
-		static v8::Handle<v8::Value> accMul(const v8::Arguments& args);
-		static v8::Handle<v8::Value> subMul(const v8::Arguments& args);
-		static v8::Handle<v8::Value> exor(const v8::Arguments& args);
-		static v8::Handle<v8::Value> bitAnd(const v8::Arguments& args);
-		static v8::Handle<v8::Value> bitOr(const v8::Arguments& args);
-		static v8::Handle<v8::Value> population(const v8::Arguments& args);
-		static v8::Handle<v8::Value> hamDist(const v8::Arguments& args);
-		static v8::Handle<v8::Value> lShift(const v8::Arguments& args);
-		static v8::Handle<v8::Value> rShift(const v8::Arguments& args);
-		static v8::Handle<v8::Value> cmp(const v8::Arguments& args);
-		static v8::Handle<v8::Value> isEven(const v8::Arguments& args);
-		static v8::Handle<v8::Value> isOdd(const v8::Arguments& args);
-		static v8::Handle<v8::Value> pow(const v8::Arguments& args);
-		static v8::Handle<v8::Value> root(const v8::Arguments& args);
-		static v8::Handle<v8::Value> invert(const v8::Arguments& args);
-		static v8::Handle<v8::Value> div(const v8::Arguments& args);
-		static mpz_t * modRes(mpz_t * res, v8::Local<v8::Value> modulus);
-		
+		static v8::Handle<v8::Value> getPrecision(v8::Local<v8::String> property, const v8::AccessorInfo &info);
+		static void setPrecision(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::AccessorInfo& info);
+		static v8::Handle<v8::Value> getRmode(v8::Local<v8::String> property, const v8::AccessorInfo &info);
+		static void setRmode(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::AccessorInfo& info);
+		mpfr_t *mpFloat_;
+		config *defaults;		
 };
 
 #endif
