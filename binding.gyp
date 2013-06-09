@@ -1,8 +1,8 @@
 {
   "targets": [
     {
-      "target_name": "bigInteger",
-      "sources": [ "bigInteger.cc", "bigInt.cc" ],
+      "target_name": "bigIrrational",
+      "sources": [ "bigIrrational.cc", "bigFloat.cc" ],
       'conditions': [
         ['OS=="linux"',
           {
