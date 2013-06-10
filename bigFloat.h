@@ -9,16 +9,18 @@
 #include <mpfr.h>
 
 class config {
-	public:
-		config(mpfr_prec_t precision, mpfr_rnd_t rMode) : precision_(precision), rMode_(rMode) { }
-		mpfr_prec_t precision_;
-		mpfr_rnd_t rMode_;
+	public:	
+		config(long int precision, int rMode) : precision_(precision), rMode_(rMode) { }
+		long int precision_;
+		int rMode_;
 };
 
 class bigFloat : public node::ObjectWrap {
 	public:
-		static void Init(v8::Handle<v8::Value> precision, v8::Handle<v8::Value> rMode);
+		static void Init();
 		static v8::Handle<v8::Value> NewInstance(const v8::Arguments& args);
+		mpfr_t *mpFloat_;
+		config *defaults_;
 	private:
 		bigFloat();
 		~bigFloat();
@@ -30,8 +32,6 @@ class bigFloat : public node::ObjectWrap {
 		static void setPrecision(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::AccessorInfo& info);
 		static v8::Handle<v8::Value> getRmode(v8::Local<v8::String> property, const v8::AccessorInfo &info);
 		static void setRmode(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::AccessorInfo& info);
-		mpfr_t *mpFloat_;
-		config *defaults;		
 };
 
 #endif

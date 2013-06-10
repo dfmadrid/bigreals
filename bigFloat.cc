@@ -21,25 +21,22 @@ bigFloat::~bigFloat(){
 
 Persistent<Function> bigFloat::constructor;
 
-void bigFloat::Init(Handle<Value> precision, Handle<Value> rMode) {
+void bigFloat::Init() {
 
   // Constructor template
   
   Local<FunctionTemplate> tpl = FunctionTemplate::New(New);
   tpl->SetClassName(String::NewSymbol("bigFloat"));
-  
   // Instance Vars
-  tpl->InstanceTemplate()->SetAccessor(String::New("rMode"), getRmode, setRmode);
-    tpl->InstanceTemplate()->SetAccessor(String::New("precision"), getPrecision, setPrecision);
-  tpl->InstanceTemplate()->SetInternalFieldCount(2);
-  
+  tpl->InstanceTemplate()->SetInternalFieldCount(1);
+
   // Javascript Prototype of object
 
   tpl->PrototypeTemplate()->Set(String::NewSymbol("inspect"),
     FunctionTemplate::New(inspect)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("toString"),
     FunctionTemplate::New(toString)->GetFunction());
-  
+
   constructor = Persistent<Function>::New(tpl->GetFunction());
 
 }
@@ -48,34 +45,35 @@ Handle<Value> bigFloat::getPrecision(Local<String> property, const AccessorInfo 
 
     Local<Object> self = info.Holder();
     Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
-    void* ptr = wrap->Value();;
-    long int value = static_cast<config*>(ptr)->precision_;
+    void* ptr = wrap->Value();
+        long int value = static_cast<config*>(ptr)->precision_;	
     return Integer::New(value);
-  }
+}
   
 void bigFloat::setPrecision(Local<String> property, Local<Value> value, const AccessorInfo& info) {
 
     Local<Object> self = info.Holder();
     Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
-    void* ptr = wrap->Value();;
-    static_cast<config*>(ptr)->precision_ = (mpfr_prec_t) value->IntegerValue();
+    void* ptr = wrap->Value();
+        static_cast<config*>(ptr)->precision_ = value->IntegerValue();
   }
 
 Handle<Value> bigFloat::getRmode(Local<String> property, const AccessorInfo &info) {
 
     Local<Object> self = info.Holder();
     Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
+
     void* ptr = wrap->Value();
-    int value = static_cast<config*>(ptr)->rMode_;
+        int value = static_cast<config*>(ptr)->precision_;
     return Integer::New(value);
-  }
+}
   
 void bigFloat::setRmode(Local<String> property, Local<Value> value, const AccessorInfo& info) {
 
     Local<Object> self = info.Holder();
     Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
     void* ptr = wrap->Value();
-    static_cast<config*>(ptr)->rMode_ = (mpfr_rnd_t) value->Int32Value();
+        static_cast<config*>(ptr)->rMode_ = value->Int32Value();
   }
 
 /* Constructor.
@@ -85,23 +83,25 @@ void bigFloat::setRmode(Local<String> property, Local<Value> value, const Access
 
 Handle<Value> bigFloat::New(const Arguments& args){
   HandleScope scope;
+  
   bigFloat *obj = new bigFloat();
-  obj->defaults = new config((mpfr_prec_t) 53, (mpfr_rnd_t) MPFR_RNDD); 
-  obj->mpFloat_ = new mpfr_t[1];	
+  Handle<External> defaults = External::Wrap(new config(53, 3));
+  obj->defaults_ = (config *) External::Unwrap(defaults);
+  obj->mpFloat_ = new mpfr_t[1];
   int base = 10;
 
   if(args[0]->IsUndefined()){
-    mpfr_init2(*obj->mpFloat_, obj->defaults->precision_);
+    mpfr_init2(*obj->mpFloat_, (mpfr_prec_t) obj->defaults_->precision_);
   }
   else if(args[0]->IsNumber()){
     if(args.Length() > 1 && args[1]->IsNumber()){
-      obj->defaults->precision_ = (mpfr_prec_t) args[1]->ToInteger()->Value();			
+      obj->defaults_->precision_ = args[1]->ToInteger()->Value();			
     }
     if(args.Length() > 2 && args[2]->IsInt32()){
-      obj->defaults->rMode_ = (mpfr_rnd_t) args[2]->ToInt32()->Value();
+      obj->defaults_->rMode_ = args[2]->ToInt32()->Value();
     }
-    mpfr_init2(*obj->mpFloat_, obj->defaults->precision_);
-    mpfr_set_d(*obj->mpFloat_, args[0]->ToNumber()->Value(), obj->defaults->rMode_);
+    mpfr_init2(*obj->mpFloat_, (mpfr_prec_t) obj->defaults_->precision_);
+    mpfr_set_d(*obj->mpFloat_, args[0]->ToNumber()->Value(), (mpfr_rnd_t) obj->defaults_->rMode_);
   }	
   else if(args[0]->IsString()){
     if(args.Length() > 1 && args[1]->IsNumber()){
@@ -112,14 +112,14 @@ Handle<Value> bigFloat::New(const Arguments& args){
       }
     }
     if(args.Length() > 2 && args[2]->IsInt32()){
-      obj->defaults->precision_ = (mpfr_prec_t) args[2]->ToInt32()->Value();
+      obj->defaults_->precision_ = args[2]->ToInt32()->Value();
     }
     if(args.Length() > 3 && args[3]->IsInt32()){
-      obj->defaults->rMode_ = (mpfr_rnd_t) args[3]->ToInt32()->Value();
+      obj->defaults_->rMode_ = (mpfr_rnd_t) args[3]->ToInt32()->Value();
     }
-  mpfr_init2(*obj->mpFloat_, obj->defaults->precision_);
+  mpfr_init2(*obj->mpFloat_, (mpfr_prec_t) obj->defaults_->precision_);
   String::Utf8Value str(args[0]->ToString());
-  mpfr_set_str(*obj->mpFloat_, *str, base, obj->defaults->rMode_);
+  mpfr_set_str(*obj->mpFloat_, *str, base, (mpfr_rnd_t) obj->defaults_->rMode_);
   }
   else if(args[0]->IsExternal()){
     obj->mpFloat_ = (mpfr_t *) External::Unwrap(args[0]);
@@ -131,7 +131,7 @@ Handle<Value> bigFloat::New(const Arguments& args){
 
   obj->Wrap(args.This());
 
-  return args.This();
+  return scope.Close(args.This());
 }
 
 Handle<Value> bigFloat::NewInstance(const Arguments& args) {
@@ -140,9 +140,10 @@ Handle<Value> bigFloat::NewInstance(const Arguments& args) {
   const unsigned argc = 1;
   Handle<Value> argv[argc] = { args[0] };
   Local<Object> instance = constructor->NewInstance(argc, argv);	
-  config * defaults = ObjectWrap::Unwrap<bigFloat>(instance)->defaults;
-  instance->SetInternalField(0, External::New(defaults));
-
+  bigFloat *num = ObjectWrap::Unwrap<bigFloat>(instance);
+  instance->Set(String::NewSymbol("precision"), Integer::New(num->defaults_->precision_));
+  instance->Set(String::NewSymbol("rMode"), Integer::New(num->defaults_->rMode_));
+  
   return scope.Close(instance);
 }
 
@@ -153,11 +154,9 @@ Handle<Value> bigFloat::inspect(const Arguments& args) {
 
   HandleScope scope;
   bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
-  
-  config * defaults = (config *) External::Unwrap(args.This()->GetInternalField(0));   
-
+  printf("%d", obj->defaults_->rMode_);	
   mpfr_exp_t *exponent = new mpfr_exp_t[1];
-  Local<String> floatValue = String::New(mpfr_get_str(NULL, exponent, 10, 0, *obj->mpFloat_, MPFR_RNDD));
+  Local<String> floatValue = String::New(mpfr_get_str(NULL, exponent, 10, 0, *obj->mpFloat_, (mpfr_rnd_t) obj->defaults_->rMode_));
   Local<String> expString = String::Concat(String::New("e"), Number::New((uint64_t) *exponent)->ToString());
   Local<String> type = String::Concat(String::Concat(String::New("<bigFloat:"), floatValue), expString);
 
@@ -186,10 +185,8 @@ Handle<Value> bigFloat::toString(const Arguments& args) {
     return scope.Close(Undefined()); 
   }
   
-  config * defaults = (config *) External::Unwrap(args.This()->GetInternalField(0));
-       
   mpfr_exp_t *exponent = new mpfr_exp_t[1];
-  Local<String> floatValue = String::New(mpfr_get_str(NULL, exponent, 10, 0, *obj->mpFloat_, defaults->rMode_));
+  Local<String> floatValue = String::New(mpfr_get_str(NULL, exponent, base, 0, *obj->mpFloat_, (mpfr_rnd_t) obj->defaults_->rMode_));
   Local<String> expString = Number::New((uint64_t) *exponent)->ToString();
   Local<String> baseString = String::Concat(floatValue, String::New("e"));
         

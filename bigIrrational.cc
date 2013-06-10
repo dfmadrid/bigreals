@@ -2,8 +2,8 @@
 #define BUILDING_NODE_EXTENSION
 #endif
 #include <node.h>
-#include <mpfr.h>
 #include "bigFloat.h"
+
 using namespace v8;
 
 Handle<Value> bigIrrational(const Arguments& args) {
@@ -15,9 +15,7 @@ Handle<Value> bigIrrational(const Arguments& args) {
 
 void InitAll(Handle<Object> exports, Handle<Object> module) {
   
-  Handle<Value> precision = Integer::New(53);
-  Handle<Value> rMode = Integer::New((int32_t) MPFR_RNDD);
-  bigFloat::Init(precision, rMode);
+  bigFloat::Init();
 
   module->Set(String::NewSymbol("exports"),
     FunctionTemplate::New(bigIrrational)->GetFunction());
