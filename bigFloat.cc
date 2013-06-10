@@ -49,6 +49,18 @@ void bigFloat::Init() {
     FunctionTemplate::New(inspect)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("toString"),
     FunctionTemplate::New(toString)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("precision"),
+    FunctionTemplate::New(precision)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("rMode"),
+    FunctionTemplate::New(rMode)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("add"),
+    FunctionTemplate::New(add)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("sub"),
+    FunctionTemplate::New(sub)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("mul"),
+    FunctionTemplate::New(mul)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("div"),
+    FunctionTemplate::New(div)->GetFunction());
 
   constructor = Persistent<Function>::New(tpl->GetFunction());
 
@@ -153,7 +165,7 @@ Handle<Value> bigFloat::NewInstance(const Arguments& args) {
 
   const unsigned argc = 1;
   Handle<Value> argv[argc] = { args[0] };
-  Local<Object> instance = constructor->NewInstance(argc, argv);	
+  Local<Object> instance = constructor->NewInstance(argc, argv);
   
   return scope.Close(instance);
 }
@@ -205,3 +217,291 @@ Handle<Value> bigFloat::toString(const Arguments& args) {
   return scope.Close(String::Concat(baseString, expString));
 }
 
+/* Gets or sets the precision of the Irrational number.
+ * An optional base to convert the string to could be optionally provided.
+ * Accepts no arguments or a int32 >= 2 and <=62.
+ */
+
+Handle<Value> bigFloat::precision(const Arguments& args) {
+  HandleScope scope;
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  int base = 10;
+  
+  if(args[0]->IsInt32()){
+    base = args[0]->ToInt32()->Value();
+    if(base < 2 || base > 62) {
+      ThrowException(Exception::Error(String::New("Base must be >= 2 and <= 62. If empty, default is 10")));
+      return scope.Close(Undefined());
+    }
+  }
+  else if(args.Length() > 0){
+    ThrowException(Exception::TypeError(String::New("Base must be a positive integer")));
+    return scope.Close(Undefined()); 
+  }
+  
+  mpfr_exp_t *exponent = new mpfr_exp_t[1];
+  Local<String> floatValue = String::New(mpfr_get_str(NULL, exponent, base, 0, *obj->mpFloat_, (mpfr_rnd_t) obj->rMode_));
+  Local<String> expString = Number::New((uint64_t) *exponent)->ToString();
+  Local<String> baseString = String::Concat(floatValue, String::New("e"));
+        
+  
+  return scope.Close(String::Concat(baseString, expString));
+}
+
+/* Gets or sets the rounding mode of the irrationla number.
+ * An optional base to convert the string to could be optionally provided.
+ * Accepts no arguments or a int32 >= 2 and <=62.
+ */
+
+Handle<Value> bigFloat::rMode(const Arguments& args) {
+  HandleScope scope;
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  int base = 10;
+  
+  if(args[0]->IsInt32()){
+    base = args[0]->ToInt32()->Value();
+    if(base < 2 || base > 62) {
+      ThrowException(Exception::Error(String::New("Base must be >= 2 and <= 62. If empty, default is 10")));
+      return scope.Close(Undefined());
+    }
+  }
+  else if(args.Length() > 0){
+    ThrowException(Exception::TypeError(String::New("Base must be a positive integer")));
+    return scope.Close(Undefined()); 
+  }
+  
+  mpfr_exp_t *exponent = new mpfr_exp_t[1];
+  Local<String> floatValue = String::New(mpfr_get_str(NULL, exponent, base, 0, *obj->mpFloat_, (mpfr_rnd_t) obj->rMode_));
+  Local<String> expString = Number::New((uint64_t) *exponent)->ToString();
+  Local<String> baseString = String::Concat(floatValue, String::New("e"));
+        
+  
+  return scope.Close(String::Concat(baseString, expString));
+}
+
+/* Addition, normal or modular.
+ * Accepts as main argument a uint64 or a biginteger object and
+ * optionally a uint64 or biginteger modulus for modular addition.
+ */
+
+Handle<Value> bigFloat::add(const Arguments& args) {
+  HandleScope scope;
+
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  mpfr_t * res = new mpfr_t[1];
+        Local<Object> defaults = args.This()->Get(String::New("defaults"))->ToObject();
+  mpfr_prec_t precision = (mpfr_prec_t ) defaults->Get(String::New("precision"))->ToInteger()->Value();
+  mpfr_rnd_t rMode = (mpfr_rnd_t) defaults->Get(String::New("rMode"))->ToInt32()->Value();
+    
+  if(args.Length() > 2){
+    if(args[2]->IsNumber()){
+      precision = (mpfr_prec_t) args[2]->ToInteger()->Value();
+    }
+    else{		
+      ThrowException(Exception::TypeError(String::New("Precision must be an integer")));
+      return scope.Close(Undefined());
+    }
+  }
+  if(args.Length() > 3){
+    if(args[3]->IsInt32()){
+      rMode = (mpfr_rnd_t) args[3]->ToInt32()->Value();
+      if((int) rMode < 0 || (int) rMode > 4){
+        ThrowException(Exception::TypeError(String::New("Rounding mode must be 0, 1, 2, 3 or 4")));
+        return scope.Close(Undefined());
+      }	
+    }
+    else{		
+      ThrowException(Exception::TypeError(String::New("Rounding must be an integer")));
+      return scope.Close(Undefined());
+    }
+  }
+      
+  mpfr_init2(*res, precision);
+        
+  if(args[0]->IsNumber()){
+    mpfr_add_d(*res, *obj->mpFloat_, args[0]->ToNumber()->Value(), rMode);
+  }
+  else if(args[0]->IsObject()){
+    bigFloat* obj2 = ObjectWrap::Unwrap<bigFloat>(args[0]->ToObject());
+    mpfr_add(*res, *obj->mpFloat_, *obj2->mpFloat_, rMode);
+  }
+  else{
+    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigfloat or number")));
+    return scope.Close(Undefined());
+  }
+
+  Handle<Value> arg[1] = { External::New(*res) };		
+  Local<Object> result = constructor->NewInstance(1, arg);
+
+  return scope.Close(result);
+}
+
+/* Substraction, normal or modular.
+ * Accepts as main argument a uint64 or a biginteger object and
+ * optionally a uint64 or biginteger modulus for modular addition.
+ */
+
+Handle<Value> bigFloat::sub(const Arguments& args) {
+  HandleScope scope;
+
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  mpfr_t * res = new mpfr_t[1];
+        Local<Object> defaults = args.This()->Get(String::New("defaults"))->ToObject();
+  mpfr_prec_t precision = (mpfr_prec_t ) defaults->Get(String::New("precision"))->ToInteger()->Value();
+  mpfr_rnd_t rMode = (mpfr_rnd_t) defaults->Get(String::New("rMode"))->ToInt32()->Value();
+    
+  if(args.Length() > 2){
+    if(args[2]->IsNumber()){
+      precision = (mpfr_prec_t) args[2]->ToInteger()->Value();
+    }
+    else{		
+      ThrowException(Exception::TypeError(String::New("Precision must be an integer")));
+      return scope.Close(Undefined());
+    }
+  }
+  if(args.Length() > 3){
+    if(args[3]->IsInt32()){
+      rMode = (mpfr_rnd_t) args[3]->ToInt32()->Value();
+      if((int) rMode < 0 || (int) rMode > 4){
+        ThrowException(Exception::TypeError(String::New("Rounding mode must be 0, 1, 2, 3 or 4")));
+        return scope.Close(Undefined());
+      }	
+    }
+    else{		
+      ThrowException(Exception::TypeError(String::New("Rounding must be an integer")));
+      return scope.Close(Undefined());
+    }
+  }
+      
+  mpfr_init2(*res, precision);
+        
+  if(args[0]->IsNumber()){
+    mpfr_sub_d(*res, *obj->mpFloat_, args[0]->ToNumber()->Value(), rMode);
+  }
+  else if(args[0]->IsObject()){
+    bigFloat* obj2 = ObjectWrap::Unwrap<bigFloat>(args[0]->ToObject());
+    mpfr_sub(*res, *obj->mpFloat_, *obj2->mpFloat_, rMode);
+  }
+  else{
+    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigfloat or number")));
+    return scope.Close(Undefined());
+  }
+
+  Handle<Value> arg[1] = { External::New(*res) };		
+  Local<Object> result = constructor->NewInstance(1, arg);
+
+  return scope.Close(result);
+}
+
+/* Substraction, normal or modular.
+ * Accepts as main argument a uint64 or a biginteger object and
+ * optionally a uint64 or biginteger modulus for modular addition.
+ */
+
+Handle<Value> bigFloat::mul(const Arguments& args) {
+  HandleScope scope;
+
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  mpfr_t * res = new mpfr_t[1];
+        Local<Object> defaults = args.This()->Get(String::New("defaults"))->ToObject();
+  mpfr_prec_t precision = (mpfr_prec_t ) defaults->Get(String::New("precision"))->ToInteger()->Value();
+  mpfr_rnd_t rMode = (mpfr_rnd_t) defaults->Get(String::New("rMode"))->ToInt32()->Value();
+    
+  if(args.Length() > 2){
+    if(args[2]->IsNumber()){
+      precision = (mpfr_prec_t) args[2]->ToInteger()->Value();
+    }
+    else{		
+      ThrowException(Exception::TypeError(String::New("Precision must be an integer")));
+      return scope.Close(Undefined());
+    }
+  }
+  if(args.Length() > 3){
+    if(args[3]->IsInt32()){
+      rMode = (mpfr_rnd_t) args[3]->ToInt32()->Value();
+      if((int) rMode < 0 || (int) rMode > 4){
+        ThrowException(Exception::TypeError(String::New("Rounding mode must be 0, 1, 2, 3 or 4")));
+        return scope.Close(Undefined());
+      }	
+    }
+    else{		
+      ThrowException(Exception::TypeError(String::New("Rounding must be an integer")));
+      return scope.Close(Undefined());
+    }
+  }
+      
+  mpfr_init2(*res, precision);
+        
+  if(args[0]->IsNumber()){
+    mpfr_mul_d(*res, *obj->mpFloat_, args[0]->ToNumber()->Value(), rMode);
+  }
+  else if(args[0]->IsObject()){
+    bigFloat* obj2 = ObjectWrap::Unwrap<bigFloat>(args[0]->ToObject());
+    mpfr_mul(*res, *obj->mpFloat_, *obj2->mpFloat_, rMode);
+  }
+  else{
+    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigfloat or number")));
+    return scope.Close(Undefined());
+  }
+
+  Handle<Value> arg[1] = { External::New(*res) };		
+  Local<Object> result = constructor->NewInstance(1, arg);
+
+  return scope.Close(result);
+}
+/* Substraction, normal or modular.
+ * Accepts as main argument a uint64 or a biginteger object and
+ * optionally a uint64 or biginteger modulus for modular addition.
+ */
+
+Handle<Value> bigFloat::div(const Arguments& args) {
+  HandleScope scope;
+
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  mpfr_t * res = new mpfr_t[1];
+        Local<Object> defaults = args.This()->Get(String::New("defaults"))->ToObject();
+  mpfr_prec_t precision = (mpfr_prec_t ) defaults->Get(String::New("precision"))->ToInteger()->Value();
+  mpfr_rnd_t rMode = (mpfr_rnd_t) defaults->Get(String::New("rMode"))->ToInt32()->Value();
+    
+  if(args.Length() > 2){
+    if(args[2]->IsNumber()){
+      precision = (mpfr_prec_t) args[2]->ToInteger()->Value();
+    }
+    else{		
+      ThrowException(Exception::TypeError(String::New("Precision must be an integer")));
+      return scope.Close(Undefined());
+    }
+  }
+  if(args.Length() > 3){
+    if(args[3]->IsInt32()){
+      rMode = (mpfr_rnd_t) args[3]->ToInt32()->Value();
+      if((int) rMode < 0 || (int) rMode > 4){
+        ThrowException(Exception::TypeError(String::New("Rounding mode must be 0, 1, 2, 3 or 4")));
+        return scope.Close(Undefined());
+      }	
+    }
+    else{		
+      ThrowException(Exception::TypeError(String::New("Rounding must be an integer")));
+      return scope.Close(Undefined());
+    }
+  }
+      
+  mpfr_init2(*res, precision);
+        
+  if(args[0]->IsNumber()){
+    mpfr_div_d(*res, *obj->mpFloat_, args[0]->ToNumber()->Value(), rMode);
+  }
+  else if(args[0]->IsObject()){
+    bigFloat* obj2 = ObjectWrap::Unwrap<bigFloat>(args[0]->ToObject());
+    mpfr_div(*res, *obj->mpFloat_, *obj2->mpFloat_, rMode);
+  }
+  else{
+    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigfloat or number")));
+    return scope.Close(Undefined());
+  }
+
+  Handle<Value> arg[1] = { External::New(*res) };		
+  Local<Object> result = constructor->NewInstance(1, arg);
+
+  return scope.Close(result);
+}
