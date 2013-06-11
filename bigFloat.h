@@ -32,6 +32,9 @@ class bigFloat : public node::ObjectWrap {
 		static v8::Handle<v8::Value> sub(const v8::Arguments& args);
 		static v8::Handle<v8::Value> mul(const v8::Arguments& args);
 		static v8::Handle<v8::Value> div(const v8::Arguments& args);
+		static v8::Handle<v8::Value> pow(const v8::Arguments& args);
+		static v8::Handle<v8::Value> root(const v8::Arguments& args);
+		static v8::Handle<v8::Value> cmp(const v8::Arguments& args);
 		static v8::Handle<v8::Value> getPrecision(v8::Local<v8::String> property, const v8::AccessorInfo &info);
 		static void setPrecision(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::AccessorInfo& info);
 		static v8::Handle<v8::Value> getRmode(v8::Local<v8::String> property, const v8::AccessorInfo &info);
