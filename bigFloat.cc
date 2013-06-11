@@ -7,9 +7,12 @@
 #endif
 
 #include <node.h>
+#include <iostream>
+#include <string>
 #include <gmp.h>
 #include <mpfr.h>
 #include "bigFloat.h"
+
 
 using namespace v8;
 
@@ -182,14 +185,17 @@ Handle<Value> bigFloat::NewInstance(const Arguments& args) {
 Handle<Value> bigFloat::inspect(const Arguments& args) {
 
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
-  printf("%d", obj->rMode_);	
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());	
   mpfr_exp_t *exponent = new mpfr_exp_t[1];
-  Local<String> floatValue = String::New(mpfr_get_str(NULL, exponent, 10, 0, *obj->mpFloat_, (mpfr_rnd_t) obj->rMode_));
-  Local<String> expString = String::Concat(String::New("e"), Number::New((uint64_t) *exponent)->ToString());
-  Local<String> type = String::Concat(String::Concat(String::New("<bigFloat:"), floatValue), expString);
 
-  return scope.Close(String::Concat(type, String::New(">")));
+  String::Utf8Value str(String::New(mpfr_get_str(NULL, exponent, 10, obj->precision_, *obj->mpFloat_, (mpfr_rnd_t) obj->rMode_)));
+  std::string floatValue = *str;
+  floatValue.insert((uint64_t) *exponent, ".");
+  Local<String> base = String::Concat(String::New("{ bigFloat: "), String::New(floatValue.c_str()));
+  Local<String> precision = String::Concat(String::New(" , precision: "), Number::New((long int) obj->precision_)->ToString());
+  Local<String> type = String::Concat(String::Concat(base, precision), String::New(" }"));
+
+  return scope.Close(type);
 }
 
 /* Returns a string representing the bigFloat.
@@ -198,6 +204,7 @@ Handle<Value> bigFloat::inspect(const Arguments& args) {
  */
 
 Handle<Value> bigFloat::toString(const Arguments& args) {
+
   HandleScope scope;
   bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
   int base = 10;
@@ -215,12 +222,11 @@ Handle<Value> bigFloat::toString(const Arguments& args) {
   }
   
   mpfr_exp_t *exponent = new mpfr_exp_t[1];
-  Local<String> floatValue = String::New(mpfr_get_str(NULL, exponent, base, 0, *obj->mpFloat_, (mpfr_rnd_t) obj->rMode_));
-  Local<String> expString = Number::New((uint64_t) *exponent)->ToString();
-  Local<String> baseString = String::Concat(floatValue, String::New("e"));
-        
-  
-  return scope.Close(String::Concat(baseString, expString));
+  String::Utf8Value str(String::New(mpfr_get_str(NULL, exponent, base, obj->precision_, *obj->mpFloat_, (mpfr_rnd_t) obj->rMode_)));
+  std::string floatValue = *str;
+  floatValue.insert((uint64_t) *exponent, ".");
+
+  return scope.Close(String::New(floatValue.c_str()));
 }
 
 /* Gets or sets the precision of the Irrational number.
@@ -229,29 +235,25 @@ Handle<Value> bigFloat::toString(const Arguments& args) {
  */
 
 Handle<Value> bigFloat::precision(const Arguments& args) {
+  
   HandleScope scope;
   bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
-  int base = 10;
+  long int precision = 0;
   
-  if(args[0]->IsInt32()){
-    base = args[0]->ToInt32()->Value();
-    if(base < 2 || base > 62) {
-      ThrowException(Exception::Error(String::New("Base must be >= 2 and <= 62. If empty, default is 10")));
-      return scope.Close(Undefined());
-    }
+  if(args[0]->IsUndefined()){
+    precision = (long int) mpfr_get_prec(*obj->mpFloat_);
   }
-  else if(args.Length() > 0){
-    ThrowException(Exception::TypeError(String::New("Base must be a positive integer")));
+  else if(args[0]->IsNumber()){
+    precision = args[0]->ToInteger()->Value();
+    mpfr_prec_round(*obj->mpFloat_, (mpfr_prec_t) precision, obj->rMode_);
+    obj->precision_ = (mpfr_prec_t) precision;
+  }
+  else{
+    ThrowException(Exception::TypeError(String::New("Precision must be a long integer. Leave blank to get precision of object")));
     return scope.Close(Undefined()); 
   }
-  
-  mpfr_exp_t *exponent = new mpfr_exp_t[1];
-  Local<String> floatValue = String::New(mpfr_get_str(NULL, exponent, base, 0, *obj->mpFloat_, (mpfr_rnd_t) obj->rMode_));
-  Local<String> expString = Number::New((uint64_t) *exponent)->ToString();
-  Local<String> baseString = String::Concat(floatValue, String::New("e"));
-        
-  
-  return scope.Close(String::Concat(baseString, expString));
+    
+  return scope.Close(Number::New(precision));
 }
 
 /* Gets or sets the rounding mode of the irrationla number.
@@ -260,29 +262,24 @@ Handle<Value> bigFloat::precision(const Arguments& args) {
  */
 
 Handle<Value> bigFloat::rMode(const Arguments& args) {
+  
   HandleScope scope;
   bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
-  int base = 10;
+  int rMode = 0;
   
-  if(args[0]->IsInt32()){
-    base = args[0]->ToInt32()->Value();
-    if(base < 2 || base > 62) {
-      ThrowException(Exception::Error(String::New("Base must be >= 2 and <= 62. If empty, default is 10")));
-      return scope.Close(Undefined());
-    }
+  if(args[0]->IsUndefined()){
+    rMode = (int) obj->rMode_;
   }
-  else if(args.Length() > 0){
-    ThrowException(Exception::TypeError(String::New("Base must be a positive integer")));
+  else if(args[0]->IsNumber()){
+    rMode = args[0]->ToInteger()->Value();
+    obj->rMode_ = (mpfr_rnd_t) rMode;
+  }
+  else{
+    ThrowException(Exception::TypeError(String::New("Rounding mode must be 0, 1, 2, 3, or 4. Leave blank to get rounding mode of object")));
     return scope.Close(Undefined()); 
   }
-  
-  mpfr_exp_t *exponent = new mpfr_exp_t[1];
-  Local<String> floatValue = String::New(mpfr_get_str(NULL, exponent, base, 0, *obj->mpFloat_, (mpfr_rnd_t) obj->rMode_));
-  Local<String> expString = Number::New((uint64_t) *exponent)->ToString();
-  Local<String> baseString = String::Concat(floatValue, String::New("e"));
-        
-  
-  return scope.Close(String::Concat(baseString, expString));
+    
+  return scope.Close(Number::New(rMode));
 }
 
 /* Addition, normal or modular.

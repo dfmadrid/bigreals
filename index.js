@@ -7,9 +7,16 @@
 */
 
 var bigInteger = require("./build/Release/bigInteger");
+var bigFloat = require("./build/Release/bigIrrational");
 
 module.exports = function(value, value2, value3){
 
-	return bigInteger(value, value2, value3);
+  return bigInteger(value, value2, value3);
 
 };
+
+module.exports.float = bigFloat;
+
+module.exports.precision = 53;
+
+module.exports.rMode = 3;
