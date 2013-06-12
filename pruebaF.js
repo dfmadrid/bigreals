@@ -1,0 +1,54 @@
+var bigreals = require('./index');
+
+var a = bigreals.float(4.0);
+
+console.log(a.defaults);
+a.defaults.precision = 57;
+console.log("New precision a = " + a.defaults.precision);
+a.defaults.rMode = 5;
+console.log("New rMode of a = " + a.defaults.rMode);
+
+var b = bigreals.float(65e-1);
+console.log(b.defaults);
+b.defaults.precision = 100;
+b.defaults.rMode = 3;
+console.log("New Precision of b is = "+ b.defaults.precision);
+console.log("New Rounding mode of b = " + b.defaults.rMode);
+console.log(b.defaults);
+
+console.log(a);
+console.log(b);
+//a.precision = 20;
+console.log("a = " + a.toString());
+console.log("b = " + b.toString());
+console.log("Precision of a is = " + a.precision());
+console.log("Rounding mode of a is = " + a.rMode());
+a.precision(200);
+console.log("New precision of a is = " + a.precision());
+var c = a.add(b);
+console.log("c = a + b = " + c.toString());
+var d = a.add(4,1024);
+console.log("d = a + 4 = " + d.toString());
+console.log("Precision of d = " + d.precision());
+var e = d.sub(a);
+console.log("e = d - a = " + e.toString());
+console.log("e * b = " + e.mul(b).toString());
+console.log("b / a = " + b.div(a).toString());
+console.log("e ^ 2 = " + e.pow(2).toString());
+var f = e.root(3, 1024);
+console.log("e ^ 1/3 = " + f.toString());
+console.log("Precision of f is = " + f.precision());
+console.log("a cmp b = " + a.cmp(b));
+console.log("c cmp b = " + c.cmp(b));
+console.log("a cmp a = " + a.cmp(a));
+a.defaults.precision = 300;
+a.defaults.rMode = 0;
+var h = bigreals.float("1234567890abcdefghijklmn", 24);
+console.log(h);
+var x = bigreals.float("60509751690538858612029415201127");
+console.log(x);
+var g = bigreals.float("123456.123456789012345678901234567890");
+console.log(x.mul(g, 67).toString(10,67));
+console.log(g);
+var n = bigreals.float(-0.93);
+console.log("abs(n) = " + n.abs(8).toString(10, 8));
