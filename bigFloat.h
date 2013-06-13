@@ -51,6 +51,7 @@ class bigFloat : public node::ObjectWrap {
 		static v8::Handle<v8::Value> whatIs(const v8::Arguments& args);
 		static v8::Handle<v8::Value> isRegular(const v8::Arguments& args);
 		static v8::Handle<v8::Value> isOrdinary(const v8::Arguments& args);
+		static v8::Handle<v8::Value> applyOpConfig(bigFloat * obj, v8::Local<v8::Value> precision, v8::Local<v8::Value> rMode);
 		static v8::Handle<v8::Value> getOpPrecision(v8::Handle<v8::Value> precHandle, v8::Handle<v8::Number> precision);
 		static v8::Handle<v8::Value> getOpRmode(v8::Handle<v8::Value> rmodeHandle, v8::Handle<v8::Integer> rMode);
 		static v8::Handle<v8::Value> getPrecision(v8::Local<v8::String> property, const v8::AccessorInfo &info);

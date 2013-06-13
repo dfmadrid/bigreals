@@ -142,6 +142,28 @@ void bigFloat::setRmode(Local<String> property, Local<Value> value, const Access
         static_cast<config*>(ptr)->rMode_ = value->Int32Value();
   }
 
+Handle<Value> bigFloat::applyOpConfig(bigFloat * obj, Local<Value> precision, Local<Value> rMode){
+
+  HandleScope scope;
+
+  if(!precision->IsUndefined() && precision->IsNumber()){
+    obj->precision_ = (mpfr_prec_t) precision->ToNumber()->Value();
+  }
+
+  if(!rMode->IsUndefined() && rMode->IsUint32()){
+    if(rMode->ToUint32()->Value() > 4){
+      ThrowException(Exception::TypeError(String::New("Rounding mode must be either 0, 1, 2, 3, or 4")));
+      return scope.Close(Undefined());
+    }
+    obj->rMode_ = (mpfr_rnd_t) rMode->ToUint32()->Value();
+      
+  }
+
+  return scope.Close(Undefined());
+
+}
+
+  
 Handle<Value> bigFloat::getOpPrecision(Handle<Value> precHandle, Handle<Number> precision){
 
   HandleScope scope;
@@ -172,7 +194,7 @@ Handle<Value> bigFloat::getOpRmode(Handle<Value> rModeHandle, Handle<Integer> rM
     return scope.Close(Undefined());
   }
 
-  return scope.Close(Uint32::New(rMode->Value()));
+  return scope.Close(Integer::New(rMode->Value()));
 
 }
 
@@ -198,12 +220,20 @@ Handle<Value> bigFloat::New(const Arguments& args){
     mpfr_init2(*obj->mpFloat_, obj->precision_);
   }
   else if(args[0]->IsNumber()){
-    if(args.Length() > 1){
+    /*if(args.Length() > 1){
       obj->precision_ = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) obj->precision_))->ToInteger()->Value();
+      applyOpConfig(obj, 
       if(args.Length() > 2){
         obj->rMode_ = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) obj->rMode_))->ToUint32()->Value();
       }
+*/
+    if(args.Length() > 2){
+      applyOpConfig(obj, args[1], args[1]);
     }
+    else if(args.Length() == 2){
+      applyOpConfig(obj, args[1], *Undefined());
+    }
+
     mpfr_init2(*obj->mpFloat_, obj->precision_);
     mpfr_set_d(*obj->mpFloat_, args[0]->ToNumber()->Value(), obj->rMode_);
   }	
@@ -365,8 +395,8 @@ Handle<Value> bigFloat::rMode(const Arguments& args) {
   if(args[0]->IsUndefined()){
     rMode = (int) obj->rMode_;
   }
-  else if(args[0]->IsNumber()){
-    rMode = args[0]->ToInteger()->Value();
+  else if(args[0]->IsUint32()){
+    rMode = args[0]->ToUint32()->Value();
     obj->rMode_ = (mpfr_rnd_t) rMode;
   }
   else{
