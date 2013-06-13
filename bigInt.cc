@@ -83,7 +83,10 @@ Handle<Value> bigInt::New(const Arguments& args) {
   mpz_init(*obj->gmpInt_);
   int base = 10;
 
-  if(args[0]->IsUndefined()){
+  if(args[0]->IsExternal()){
+    obj->gmpInt_ = (mpz_t *) External::Unwrap(args[0]);
+  }
+  else if(args[0]->IsUndefined()){
     mpz_set_ui(*obj->gmpInt_, 0);
   }
   else if(args[0]->IsNumber()){
@@ -99,9 +102,6 @@ Handle<Value> bigInt::New(const Arguments& args) {
     }
   String::Utf8Value str(args[0]->ToString());
   mpz_set_str(*obj->gmpInt_, *str, base);
-  }
-  else if(args[0]->IsExternal()){
-    obj->gmpInt_ = (mpz_t *) External::Unwrap(args[0]);
   }
   else{
     ThrowException(Exception::TypeError(String::New("Argument must be an integer or a string.")));
@@ -128,9 +128,9 @@ Handle<Value> bigInt::inspect(const Arguments& args) {
   HandleScope scope;
   bigInt *obj = ObjectWrap::Unwrap<bigInt>(args.This());
   Local<String> bigIntValue = String::New(mpz_get_str(0, 10, *obj->gmpInt_));
-  Local<String> type = String::Concat(String::New("<bigInteger:"), bigIntValue);
+  Local<String> type = String::Concat(String::New("{ bigInteger: "), bigIntValue);
 
-  return scope.Close(String::Concat(type, String::New(">")));
+  return scope.Close(String::Concat(type, String::New(" }")));
 }
 
 /* Returns a string representing the bigInteger.

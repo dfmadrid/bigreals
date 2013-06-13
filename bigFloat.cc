@@ -72,6 +72,36 @@ void bigFloat::Init() {
     FunctionTemplate::New(cmp)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("abs"),
     FunctionTemplate::New(abs)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("ln"),
+    FunctionTemplate::New(ln)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("log"),
+    FunctionTemplate::New(log)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("e"),
+    FunctionTemplate::New(e)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("exp"),
+    FunctionTemplate::New(exp)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("cos"),
+    FunctionTemplate::New(cos)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("sin"),
+    FunctionTemplate::New(sin)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("tan"),
+    FunctionTemplate::New(tan)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("atan2"),
+    FunctionTemplate::New(atan2)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("sec"),
+    FunctionTemplate::New(sec)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("cosec"),
+    FunctionTemplate::New(cosec)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("cotan"),
+    FunctionTemplate::New(cotan)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("fac"),
+    FunctionTemplate::New(fac)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("whatIs"),
+    FunctionTemplate::New(whatIs)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("isRegular"),
+    FunctionTemplate::New(isRegular)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("isOrdinary"),
+    FunctionTemplate::New(isOrdinary)->GetFunction());
 
   constructor = Persistent<Function>::New(tpl->GetFunction());
 
@@ -621,6 +651,573 @@ Handle<Value> bigFloat::root(const Arguments& args) {
 
   return scope.Close(result);
 }
+
+/* Natural/Neperian Logarithm.
+ * Accepts as arguments a double or a uint64 signed integer and
+ * optionally a precision and rounding mode of the operation.
+ * If no precision is provided, chooses the highest precision
+ * of the 2 operands.
+ */
+
+
+Handle<Value> bigFloat::ln(const Arguments& args) {
+  
+  HandleScope scope;
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  mpfr_t * res = new mpfr_t[1];
+  mpfr_prec_t precision = obj->precision_;
+  mpfr_rnd_t rMode = obj->rMode_;
+    
+  if(args.Length() > 0){
+    precision = (mpfr_prec_t) getOpPrecision(args[0], Number::New((long int) precision))->ToInteger()->Value();
+    if(args.Length() > 1){
+      rMode = (mpfr_rnd_t) getOpRmode(args[1], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+    }
+  }
+  
+  mpfr_init2(*res, precision);
+  mpfr_log(*res, *obj->mpFloat_, rMode);
+
+  Handle<Value> arg[1] = { External::New(*res) };		
+  Local<Object> result = constructor->NewInstance(1, arg);
+
+  return scope.Close(result);
+}
+/* Base 2 or base 10 Logarithm.
+ * Accepts as arguments a double or a uint64 signed integer and
+ * optionally a precision and rounding mode of the operation.
+ * If no precision is provided, chooses the highest precision
+ * of the 2 operands.
+ */
+
+
+Handle<Value> bigFloat::log(const Arguments& args) {
+  
+  HandleScope scope;
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  mpfr_t * res = new mpfr_t[1];
+  mpfr_prec_t precision = obj->precision_;
+  mpfr_rnd_t rMode = obj->rMode_;
+    
+  if(args.Length() > 1){
+    precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+    if(args.Length() > 2){
+      rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+    }
+  }
+
+  if(args[0]->IsUint32()){
+    unsigned int base = args[0]->ToUint32()->Value();
+    mpfr_init2(*res, precision);
+    if(base == 2){
+      mpfr_log2(*res, *obj->mpFloat_, rMode);
+    }			 
+    else if(base != 10){
+      mpfr_log10(*res, *obj->mpFloat_, rMode);
+    }
+    else{
+      ThrowException(Exception::TypeError(String::New("Base must 2 or 10")));
+      return scope.Close(Undefined());
+    }	
+  }
+  else{
+    ThrowException(Exception::TypeError(String::New("Base must 2 or 10")));
+    return scope.Close(Undefined());
+  }	
+
+  Handle<Value> arg[1] = { External::New(*res) };		
+  Local<Object> result = constructor->NewInstance(1, arg);
+
+  return scope.Close(result);
+}
+
+
+/* Exponentiation base e.
+ * Accepts as arguments a double or a uint64 signed integer and
+ * optionally a precision and rounding mode of the operation.
+ * If no precision is provided, chooses the highest precision
+ * of the 2 operands.
+ */
+
+
+Handle<Value> bigFloat::e(const Arguments& args) {
+  
+  HandleScope scope;
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  mpfr_t * res = new mpfr_t[1];
+  mpfr_prec_t precision = obj->precision_;
+  mpfr_rnd_t rMode = obj->rMode_;
+    
+  if(args.Length() > 0){
+    precision = (mpfr_prec_t) getOpPrecision(args[0], Number::New((long int) precision))->ToInteger()->Value();
+    if(args.Length() > 1){
+      rMode = (mpfr_rnd_t) getOpRmode(args[1], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+    }
+  }
+  
+  mpfr_init2(*res, precision);
+  mpfr_exp(*res, *obj->mpFloat_, rMode);
+
+  Handle<Value> arg[1] = { External::New(*res) };		
+  Local<Object> result = constructor->NewInstance(1, arg);
+
+  return scope.Close(result);
+}
+/* 2-th or 10-th Exponentiation base e.
+ * Accepts as arguments a double or a uint64 signed integer and
+ * optionally a precision and rounding mode of the operation.
+ * If no precision is provided, chooses the highest precision
+ * of the 2 operands.
+ */
+
+
+Handle<Value> bigFloat::exp(const Arguments& args) {
+  
+  HandleScope scope;
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  mpfr_t * res = new mpfr_t[1];
+  mpfr_prec_t precision = obj->precision_;
+  mpfr_rnd_t rMode = obj->rMode_;
+    
+  if(args.Length() > 1){
+    precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+    if(args.Length() > 2){
+      rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+    }
+  }
+
+  if(args[0]->IsUint32()){
+    unsigned int base = args[0]->ToUint32()->Value();
+    mpfr_init2(*res, precision);
+    if(base == 2){
+      mpfr_exp2(*res, *obj->mpFloat_, rMode);
+    }			 
+    else if(base != 10){
+      mpfr_exp10(*res, *obj->mpFloat_, rMode);
+    }
+    else{
+      ThrowException(Exception::TypeError(String::New("Base must 2 or 10")));
+      return scope.Close(Undefined());
+    }	
+  }
+  else{
+    ThrowException(Exception::TypeError(String::New("Base must 2 or 10")));
+    return scope.Close(Undefined());
+  }	
+
+  Handle<Value> arg[1] = { External::New(*res) };		
+  Local<Object> result = constructor->NewInstance(1, arg);
+
+  return scope.Close(result);
+}
+
+/* Cos, arc-cosine and hyperbolic cosine
+ * Accepts as arguments a double or a uint64 signed integer and
+ * optionally a precision and rounding mode of the operation.
+ * If no precision is provided, chooses the highest precision
+ * of the 2 operands.
+ */
+
+Handle<Value> bigFloat::cos(const Arguments& args) {
+  
+  HandleScope scope;
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  mpfr_t * res = new mpfr_t[1];
+  mpfr_prec_t precision = obj->precision_;
+  mpfr_rnd_t rMode = obj->rMode_;
+  Local<String> cosType;
+  
+  if(args[0]->IsString()){
+    if(args.Length() > 1){
+      precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+      if(args.Length() > 2){
+        rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      }
+    }
+    mpfr_init2(*res, precision);
+    cosType = args[0]->ToString();
+    if(cosType == String::New("arc")){
+      mpfr_acos(*res, *obj->mpFloat_, rMode);
+    }
+    else if(cosType == String::New("hyp")){
+      mpfr_cosh(*res, *obj->mpFloat_, rMode);
+    }
+    else if(cosType == String::New("invhyp")){
+      mpfr_acosh(*res, *obj->mpFloat_, rMode);
+    }
+    else{
+      ThrowException(Exception::TypeError(String::New("Cosine type must be \"arc\", \"hyp\" or \"invhyp\". Leave blank for normal cosine")));
+      return scope.Close(Undefined());
+    }	
+  }
+  else if(args[0]->IsUndefined()){		
+    mpfr_init2(*res, precision);
+    mpfr_cos(*res, *obj->mpFloat_, rMode);
+  }
+  else{
+    precision = (mpfr_prec_t) getOpPrecision(args[0], Number::New((long int) precision))->ToInteger()->Value();
+    if(args.Length() > 1){
+      rMode = (mpfr_rnd_t) getOpRmode(args[1], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+    }
+    mpfr_init2(*res, precision);
+    mpfr_cos(*res, *obj->mpFloat_, rMode);
+  }
+
+  Handle<Value> arg[1] = { External::New(*res) };		
+  Local<Object> result = constructor->NewInstance(1, arg);
+
+  return scope.Close(result);
+}
+
+
+/* Sine, arc-sine and hyperbolic sine
+ * Accepts as arguments a double or a uint64 signed integer and
+ * optionally a precision and rounding mode of the operation.
+ * If no precision is provided, chooses the highest precision
+ * of the 2 operands.
+ */
+
+Handle<Value> bigFloat::sin(const Arguments& args) {
+  
+  HandleScope scope;
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  mpfr_t * res = new mpfr_t[1];
+  mpfr_prec_t precision = obj->precision_;
+  mpfr_rnd_t rMode = obj->rMode_;
+  Local<String> sineType;
+  
+  if(args[0]->IsString()){
+    if(args.Length() > 1){
+      precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+      if(args.Length() > 2){
+        rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      }
+    }
+    mpfr_init2(*res, precision);
+    sineType = args[0]->ToString();
+    if(sineType == String::New("arc")){
+      mpfr_asin(*res, *obj->mpFloat_, rMode);
+    }
+    else if(sineType == String::New("hyp")){
+      mpfr_sinh(*res, *obj->mpFloat_, rMode);
+    }
+    else if(sineType == String::New("invhyp")){
+      mpfr_asinh(*res, *obj->mpFloat_, rMode);
+    }
+    else{
+      ThrowException(Exception::TypeError(String::New("Sine type must be \"arc\", \"hyp\" or \"invhyp\". Leave blank for normal sine")));
+      return scope.Close(Undefined());
+    }	
+  }
+  else if(args[0]->IsUndefined()){		
+    mpfr_init2(*res, precision);
+    mpfr_sin(*res, *obj->mpFloat_, rMode);
+  }
+  else{
+    precision = (mpfr_prec_t) getOpPrecision(args[0], Number::New((long int) precision))->ToInteger()->Value();
+    if(args.Length() > 1){
+      rMode = (mpfr_rnd_t) getOpRmode(args[1], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+    }
+    mpfr_init2(*res, precision);
+    mpfr_sin(*res, *obj->mpFloat_, rMode);
+  }
+
+  Handle<Value> arg[1] = { External::New(*res) };		
+  Local<Object> result = constructor->NewInstance(1, arg);
+
+  return scope.Close(result);
+}
+
+
+/* Tangent, arc-tangent and hyperbolic tangent
+ * Accepts as arguments a double or a uint64 signed integer and
+ * optionally a precision and rounding mode of the operation.
+ * If no precision is provided, chooses the highest precision
+ * of the 2 operands.
+ */
+
+Handle<Value> bigFloat::tan(const Arguments& args) {
+  
+  HandleScope scope;
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  mpfr_t * res = new mpfr_t[1];
+  mpfr_prec_t precision = obj->precision_;
+  mpfr_rnd_t rMode = obj->rMode_;
+  Local<String> tanType;
+  
+  if(args[0]->IsString()){
+    if(args.Length() > 1){
+      precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+      if(args.Length() > 2){
+        rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      }
+    }
+    mpfr_init2(*res, precision);
+    tanType = args[0]->ToString();
+    if(tanType == String::New("arc")){
+      mpfr_atan(*res, *obj->mpFloat_, rMode);
+    }
+    else if(tanType == String::New("hyp")){
+      mpfr_tanh(*res, *obj->mpFloat_, rMode);
+    }
+    else if(tanType == String::New("invhyp")){
+      mpfr_atanh(*res, *obj->mpFloat_, rMode);
+    }
+    else{
+      ThrowException(Exception::TypeError(String::New("Tangent type must be \"arc\", \"hyp\" or \"invhyp\". Leave blank for normal tangent")));
+      return scope.Close(Undefined());
+    }	
+  }
+  else if(args[0]->IsUndefined()){		
+    mpfr_init2(*res, precision);
+    mpfr_tan(*res, *obj->mpFloat_, rMode);
+  }
+  else{
+    precision = (mpfr_prec_t) getOpPrecision(args[0], Number::New((long int) precision))->ToInteger()->Value();
+    if(args.Length() > 1){
+      rMode = (mpfr_rnd_t) getOpRmode(args[1], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+    }
+    mpfr_init2(*res, precision);
+    mpfr_tan(*res, *obj->mpFloat_, rMode);
+  }
+
+  Handle<Value> arg[1] = { External::New(*res) };		
+  Local<Object> result = constructor->NewInstance(1, arg);
+
+  return scope.Close(result);
+}
+
+
+
+/* Arc-tangent2.
+ * Accepts as main argument a uint64 or a biginteger object and
+ * optionally a uint64 or biginteger modulus for modular addition.
+ */
+
+Handle<Value> bigFloat::atan2(const Arguments& args) {
+  
+  HandleScope scope;
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  mpfr_t * res = new mpfr_t[1];
+        mpfr_prec_t precision = obj->precision_;
+  mpfr_rnd_t rMode = obj->rMode_;
+    
+  if(args.Length() > 1){
+    precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+    if(args.Length() > 2){
+      rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+    }
+  }
+
+  if(args[0]->IsObject()){
+    bigFloat* obj2 = ObjectWrap::Unwrap<bigFloat>(args[0]->ToObject());
+    if(obj2->precision_ > precision){
+      mpfr_init2(*res, obj2->precision_);
+    }
+    else{
+      mpfr_init2(*res, precision);
+    }
+    mpfr_atan2(*res, *obj->mpFloat_, *obj2->mpFloat_, rMode);
+  }
+  else{
+    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigfloat")));
+    return scope.Close(Undefined());
+  }
+
+  Handle<Value> arg[1] = { External::New(*res) };		
+  Local<Object> result = constructor->NewInstance(1, arg);
+
+  return scope.Close(result);
+}
+
+/* Secant and hyperbolic secant
+ * Accepts as arguments a double or a uint64 signed integer and
+ * optionally a precision and rounding mode of the operation.
+ * If no precision is provided, chooses the highest precision
+ * of the 2 operands.
+ */
+
+Handle<Value> bigFloat::sec(const Arguments& args) {
+  
+  HandleScope scope;
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  mpfr_t * res = new mpfr_t[1];
+  mpfr_prec_t precision = obj->precision_;
+  mpfr_rnd_t rMode = obj->rMode_;
+  Local<String> secType;
+  
+  if(args[0]->IsString()){
+    if(args.Length() > 1){
+      precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+      if(args.Length() > 2){
+        rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      }
+    }
+    mpfr_init2(*res, precision);
+    secType = args[0]->ToString();
+    if(secType == String::New("hyp")){
+      mpfr_sech(*res, *obj->mpFloat_, rMode);
+    }
+    else{
+      ThrowException(Exception::TypeError(String::New("Secant type must be \"hyp\". Leave blank for normal secant")));
+      return scope.Close(Undefined());
+    }	
+  }
+  else if(args[0]->IsUndefined()){		
+    mpfr_init2(*res, precision);
+    mpfr_sec(*res, *obj->mpFloat_, rMode);
+  }
+  else{
+    precision = (mpfr_prec_t) getOpPrecision(args[0], Number::New((long int) precision))->ToInteger()->Value();
+    if(args.Length() > 1){
+      rMode = (mpfr_rnd_t) getOpRmode(args[1], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+    }
+    mpfr_init2(*res, precision);
+    mpfr_sec(*res, *obj->mpFloat_, rMode);
+  }
+
+  Handle<Value> arg[1] = { External::New(*res) };		
+  Local<Object> result = constructor->NewInstance(1, arg);
+
+  return scope.Close(result);
+}
+
+
+/* Cosecant and hyperbolic cosecant
+ * Accepts as arguments a double or a uint64 signed integer and
+ * optionally a precision and rounding mode of the operation.
+ * If no precision is provided, chooses the highest precision
+ * of the 2 operands.
+ */
+
+Handle<Value> bigFloat::cosec(const Arguments& args) {
+  
+  HandleScope scope;
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  mpfr_t * res = new mpfr_t[1];
+  mpfr_prec_t precision = obj->precision_;
+  mpfr_rnd_t rMode = obj->rMode_;
+  Local<String> cosecType;
+  
+  if(args[0]->IsString()){
+    if(args.Length() > 1){
+      precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+      if(args.Length() > 2){
+        rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      }
+    }
+    mpfr_init2(*res, precision);
+    cosecType = args[0]->ToString();
+    if(cosecType == String::New("hyp")){
+      mpfr_csch(*res, *obj->mpFloat_, rMode);
+    }
+    else{
+      ThrowException(Exception::TypeError(String::New("Cosecant type must be \"hyp\". Leave blank for normal cosecant")));
+      return scope.Close(Undefined());
+    }	
+  }
+  else if(args[0]->IsUndefined()){		
+    mpfr_init2(*res, precision);
+    mpfr_csc(*res, *obj->mpFloat_, rMode);
+  }
+  else{
+    precision = (mpfr_prec_t) getOpPrecision(args[0], Number::New((long int) precision))->ToInteger()->Value();
+    if(args.Length() > 1){
+      rMode = (mpfr_rnd_t) getOpRmode(args[1], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+    }
+    mpfr_init2(*res, precision);
+    mpfr_csc(*res, *obj->mpFloat_, rMode);
+  }
+
+  Handle<Value> arg[1] = { External::New(*res) };		
+  Local<Object> result = constructor->NewInstance(1, arg);
+
+  return scope.Close(result);
+}
+
+
+/* Cotangent and hyperbolic cotangent
+ * Accepts as arguments a double or a uint64 signed integer and
+ * optionally a precision and rounding mode of the operation.
+ * If no precision is provided, chooses the highest precision
+ * of the 2 operands.
+ */
+
+Handle<Value> bigFloat::cotan(const Arguments& args) {
+  
+  HandleScope scope;
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  mpfr_t * res = new mpfr_t[1];
+  mpfr_prec_t precision = obj->precision_;
+  mpfr_rnd_t rMode = obj->rMode_;
+  Local<String> cotanType;
+  
+  if(args[0]->IsString()){
+    if(args.Length() > 1){
+      precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+      if(args.Length() > 2){
+        rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      }
+    }
+    mpfr_init2(*res, precision);
+    cotanType = args[0]->ToString();
+    if(cotanType == String::New("hyp")){
+      mpfr_coth(*res, *obj->mpFloat_, rMode);
+    }
+    else{
+      ThrowException(Exception::TypeError(String::New("Cotangent type must be \"hyp\". Leave blank for normal cotanget")));
+      return scope.Close(Undefined());
+    }	
+  }
+  else if(args[0]->IsUndefined()){		
+    mpfr_init2(*res, precision);
+    mpfr_coth(*res, *obj->mpFloat_, rMode);
+  }
+  else{
+    precision = (mpfr_prec_t) getOpPrecision(args[0], Number::New((long int) precision))->ToInteger()->Value();
+    if(args.Length() > 1){
+      rMode = (mpfr_rnd_t) getOpRmode(args[1], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+    }
+    mpfr_init2(*res, precision);
+    mpfr_coth(*res, *obj->mpFloat_, rMode);
+  }
+
+  Handle<Value> arg[1] = { External::New(*res) };		
+  Local<Object> result = constructor->NewInstance(1, arg);
+
+  return scope.Close(result);
+}
+
+
+/* Factorial.
+ * Accepts as main argument a uint64 or a biginteger object and
+ * optionally a uint64 or biginteger modulus for modular addition.
+ */
+
+Handle<Value> bigFloat::fac(const Arguments& args) {
+  
+  HandleScope scope;
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  mpfr_t * res = new mpfr_t[1];
+        mpfr_prec_t precision = obj->precision_;
+  mpfr_rnd_t rMode = obj->rMode_;
+    
+  if(args.Length() > 0){
+    precision = (mpfr_prec_t) getOpPrecision(args[0], Number::New((long int) precision))->ToInteger()->Value();
+    if(args.Length() > 2){
+      rMode = (mpfr_rnd_t) getOpRmode(args[1], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+    }
+  }
+  mpfr_init2(*res, precision);
+  unsigned long int factorized = mpfr_get_ui(*obj->mpFloat_, rMode);
+  mpfr_fac_ui(*res, factorized, rMode);
+
+  Handle<Value> arg[1] = { External::New(*res) };		
+  Local<Object> result = constructor->NewInstance(1, arg);
+
+  return scope.Close(result);
+}
+
 /* Comparison, normal or modular.
  * Accepts as main argument a uint64 or a biginteger object and
  * optionally a uint64 or biginteger modulus for modular addition.
@@ -659,7 +1256,7 @@ Handle<Value> bigFloat::abs(const Arguments& args) {
   mpfr_prec_t precision = obj->precision_;
   mpfr_rnd_t rMode = obj->rMode_;
     
-  if(args.Length() > 1){
+  if(args.Length() > 0){
       rMode = (mpfr_rnd_t) getOpRmode(args[0], Integer::New((unsigned int) rMode))->ToUint32()->Value();
   }
   
@@ -670,4 +1267,62 @@ Handle<Value> bigFloat::abs(const Arguments& args) {
   Local<Object> result = constructor->NewInstance(1, arg);
 
   return scope.Close(result);
+}
+
+/* Returns if number is a regular number (neither NaN, nor Infinity nor Zero) 
+ * Accepts as optional argument a unsigned integer as rounding mode.
+ */
+
+Handle<Value> bigFloat::isRegular(const Arguments& args) {
+  
+  HandleScope scope;
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  Local<String> type;
+  
+  return scope.Close(Boolean::New(mpfr_regular_p(*obj->mpFloat_)));
+}
+
+/* Returns if number is an ordinary number (neither NaN nor Infinity) 
+ * Accepts as optional argument a unsigned integer as rounding mode.
+ */
+
+Handle<Value> bigFloat::isOrdinary(const Arguments& args) {
+  
+  HandleScope scope;
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  Local<String> type;
+  
+  return scope.Close(Boolean::New(mpfr_number_p(*obj->mpFloat_)));
+}
+
+/* Returns if object is NaN, Infinity, Zero or an ordinary number.
+ * Accepts as optional argument a unsigned integer as rounding mode.
+ */
+
+Handle<Value> bigFloat::whatIs(const Arguments& args) {
+  
+  HandleScope scope;
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  Local<String> type;
+  
+  int result = mpfr_nan_p(*obj->mpFloat_);
+  
+  if(result != 0){
+    return scope.Close(String::New("NaN"));
+  }
+  
+  result = mpfr_inf_p(*obj->mpFloat_);
+  
+  if(result != 0){		
+    return scope.Close(String::New("Infinity"));
+  }
+  
+  result = mpfr_zero_p(*obj->mpFloat_);
+  
+  if(result != 0){		
+    return scope.Close(String::New("Zero"));
+  }
+  else{		
+    return scope.Close(String::New("Ordinary"));
+  }
 }
