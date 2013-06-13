@@ -182,10 +182,10 @@ Handle<Value> bigFloat::getOpRmode(Handle<Value> rModeHandle, Handle<Integer> rM
  */
 
 Handle<Value> bigFloat::New(const Arguments& args){
+
   HandleScope scope;
-  
   bigFloat *obj = new bigFloat();
-        Local<Object> defaults = args.This()->Get(String::New("defaults"))->ToObject();
+  Local<Object> defaults = args.This()->Get(String::New("defaults"))->ToObject();
   obj->precision_ = (mpfr_prec_t ) defaults->Get(String::New("precision"))->ToInteger()->Value();
   obj->rMode_ = (mpfr_rnd_t) defaults->Get(String::New("rMode"))->ToInt32()->Value();
   obj->mpFloat_ = new mpfr_t[1];
@@ -242,8 +242,8 @@ Handle<Value> bigFloat::New(const Arguments& args){
 }
 
 Handle<Value> bigFloat::NewInstance(const Arguments& args) {
+  
   HandleScope scope;
-
   const unsigned argc = 1;
   Handle<Value> argv[argc] = { args[0] };
   Local<Object> instance = constructor->NewInstance(argc, argv);
@@ -327,7 +327,6 @@ Handle<Value> bigFloat::toString(const Arguments& args) {
 }
 
 /* Gets or sets the precision of the Irrational number.
- * An optional base to convert the string to could be optionally provided.
  * Accepts no arguments or a int32 >= 2 and <=62.
  */
 
@@ -354,7 +353,6 @@ Handle<Value> bigFloat::precision(const Arguments& args) {
 }
 
 /* Gets or sets the rounding mode of the irrational number.
- * An optional base to convert the string to could be optionally provided.
  * Accepts no arguments or a int32 >= 2 and <=62.
  */
 
@@ -478,8 +476,8 @@ Handle<Value> bigFloat::sub(const Arguments& args) {
  */
 
 Handle<Value> bigFloat::mul(const Arguments& args) {
+  
   HandleScope scope;
-
   bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
   mpfr_t * res = new mpfr_t[1];
         mpfr_prec_t precision = obj->precision_;
@@ -517,9 +515,8 @@ Handle<Value> bigFloat::mul(const Arguments& args) {
   return scope.Close(result);
 }
 
-/* Substraction, normal or modular.
+/* Substraction.
  * Accepts as main argument a uint64 or a biginteger object and
- * optionally a uint64 or biginteger modulus for modular addition.
  */
 
 Handle<Value> bigFloat::div(const Arguments& args) {
@@ -563,7 +560,6 @@ Handle<Value> bigFloat::div(const Arguments& args) {
 }
 /* Exponentiation, normal or modular.
  * Accepts as main argument a uint64 or a biginteger object and
- * optionally a uint64 or biginteger modulus for modular addition.
  */
 
 Handle<Value> bigFloat::pow(const Arguments& args) {
@@ -608,15 +604,14 @@ Handle<Value> bigFloat::pow(const Arguments& args) {
 
 /* n-th root, normal or modular.
  * Accepts as main argument a uint64 or a biginteger object and
- * optionally a uint64 or biginteger modulus for modular addition.
  */
 
 Handle<Value> bigFloat::root(const Arguments& args) {
+  
   HandleScope scope;
-
   bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
   mpfr_t * res = new mpfr_t[1];
-        mpfr_prec_t precision = obj->precision_;
+  mpfr_prec_t precision = obj->precision_;
   mpfr_rnd_t rMode = obj->rMode_;
     
   if(args.Length() > 1){
@@ -812,10 +807,6 @@ Handle<Value> bigFloat::exp(const Arguments& args) {
 }
 
 /* Cos, arc-cosine and hyperbolic cosine
- * Accepts as arguments a double or a uint64 signed integer and
- * optionally a precision and rounding mode of the operation.
- * If no precision is provided, chooses the highest precision
- * of the 2 operands.
  */
 
 Handle<Value> bigFloat::cos(const Arguments& args) {
@@ -871,10 +862,6 @@ Handle<Value> bigFloat::cos(const Arguments& args) {
 
 
 /* Sine, arc-sine and hyperbolic sine
- * Accepts as arguments a double or a uint64 signed integer and
- * optionally a precision and rounding mode of the operation.
- * If no precision is provided, chooses the highest precision
- * of the 2 operands.
  */
 
 Handle<Value> bigFloat::sin(const Arguments& args) {
@@ -930,10 +917,6 @@ Handle<Value> bigFloat::sin(const Arguments& args) {
 
 
 /* Tangent, arc-tangent and hyperbolic tangent
- * Accepts as arguments a double or a uint64 signed integer and
- * optionally a precision and rounding mode of the operation.
- * If no precision is provided, chooses the highest precision
- * of the 2 operands.
  */
 
 Handle<Value> bigFloat::tan(const Arguments& args) {
@@ -990,8 +973,6 @@ Handle<Value> bigFloat::tan(const Arguments& args) {
 
 
 /* Arc-tangent2.
- * Accepts as main argument a uint64 or a biginteger object and
- * optionally a uint64 or biginteger modulus for modular addition.
  */
 
 Handle<Value> bigFloat::atan2(const Arguments& args) {
@@ -1031,10 +1012,6 @@ Handle<Value> bigFloat::atan2(const Arguments& args) {
 }
 
 /* Secant and hyperbolic secant
- * Accepts as arguments a double or a uint64 signed integer and
- * optionally a precision and rounding mode of the operation.
- * If no precision is provided, chooses the highest precision
- * of the 2 operands.
  */
 
 Handle<Value> bigFloat::sec(const Arguments& args) {
@@ -1084,10 +1061,6 @@ Handle<Value> bigFloat::sec(const Arguments& args) {
 
 
 /* Cosecant and hyperbolic cosecant
- * Accepts as arguments a double or a uint64 signed integer and
- * optionally a precision and rounding mode of the operation.
- * If no precision is provided, chooses the highest precision
- * of the 2 operands.
  */
 
 Handle<Value> bigFloat::cosec(const Arguments& args) {
@@ -1137,10 +1110,6 @@ Handle<Value> bigFloat::cosec(const Arguments& args) {
 
 
 /* Cotangent and hyperbolic cotangent
- * Accepts as arguments a double or a uint64 signed integer and
- * optionally a precision and rounding mode of the operation.
- * If no precision is provided, chooses the highest precision
- * of the 2 operands.
  */
 
 Handle<Value> bigFloat::cotan(const Arguments& args) {
@@ -1190,8 +1159,6 @@ Handle<Value> bigFloat::cotan(const Arguments& args) {
 
 
 /* Factorial.
- * Accepts as main argument a uint64 or a biginteger object and
- * optionally a uint64 or biginteger modulus for modular addition.
  */
 
 Handle<Value> bigFloat::fac(const Arguments& args) {
@@ -1218,9 +1185,7 @@ Handle<Value> bigFloat::fac(const Arguments& args) {
   return scope.Close(result);
 }
 
-/* Comparison, normal or modular.
- * Accepts as main argument a uint64 or a biginteger object and
- * optionally a uint64 or biginteger modulus for modular addition.
+/* Comparison.
  */
 
 Handle<Value> bigFloat::cmp(const Arguments& args) {
