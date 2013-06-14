@@ -1,22 +1,22 @@
 {
     "name" : "bigReals",
-    "version" : "0.3.0",
-    "description" : "node.js native addon to perform calculations and bit manipulations over big integers, big rationals and big floating point numbers",
+    "version" : "0.4.0",
+    "description" : "Calculations and bit manipulations over big integers and big Irrationals using gnu's gmp and mpfr",
     "main" : "./index.js",
     "repository" : {
         "type" : "git",
         "url" : "http://github.com/dfmadrid/bigreals.git"
     },
     "keywords": [
-				"biginteger",
-				"bigdecimal",
-				"bigfloating",
-				"mpfr",
+	"biginteger",
+	"bigdecimal",
+	"bigfloating",
+	"mpfr",
         "gmp",
         "libgmp",
         "integer",
-				"floating",
-				"rational",
+	"floating",
+	"rational",
         "arithmetic",
         "precision"
     ],
