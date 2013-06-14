@@ -1,14 +1,14 @@
 var bigreals = require('./index');
 
-var a = bigreals.float(4.0);
-
+var a = bigreals.float(4.0, 7);
+console.log(a);
 console.log(a.defaults);
 a.defaults.precision = 57;
 console.log("New precision a = " + a.defaults.precision);
 a.defaults.rMode = 5;
 console.log("New rMode of a = " + a.defaults.rMode);
 
-var b = bigreals.float(65e-1);
+var b = bigreals.float(65e-1, 7);
 console.log(b.defaults);
 b.defaults.precision = 100;
 b.defaults.rMode = 3;
@@ -33,9 +33,9 @@ console.log("Precision of d = " + d.precision());
 var e = d.sub(a);
 console.log("e = d - a = " + e.toString());
 console.log("e * b = " + e.mul(b).toString());
-console.log("b / a = " + b.div(a).toString());
+console.log("b / a = " + b.div(a, 23).toString());
 console.log("e ^ 2 = " + e.pow(2).toString());
-var f = e.root(3, 1024);
+var f = e.root(3, 23);
 console.log("e ^ 1/3 = " + f.toString());
 console.log("Precision of f is = " + f.precision());
 console.log("a cmp b = " + a.cmp(b));
@@ -45,10 +45,23 @@ a.defaults.precision = 300;
 a.defaults.rMode = 0;
 var h = bigreals.float("1234567890abcdefghijklmn", 24);
 console.log(h);
-var x = bigreals.float("60509751690538858612029415201127");
+var x = bigreals.float("60509751690538858612029415201127", 10, 112);
 console.log(x);
 var g = bigreals.float("123456.123456789012345678901234567890");
-console.log(x.mul(g, 67).toString(10,67));
+console.log(x.mul(g).toString(10, 72));
 console.log(g);
-var n = bigreals.float(-0.93);
-console.log("abs(n) = " + n.abs(8).toString(10, 8));
+var n = bigreals.float(-0.93, 16);
+console.log(n);
+console.log("abs(n) = " + n.abs().toString(10, 2, 0));
+var nan = bigreals.float(0.3);
+console.log(nan + "-" + nan.rMode() + "-" + nan.precision());
+console.log("cos n = " + n.cos());
+// fix bug in user supplied precision
+var aa = bigreals.float(1.45, 16);
+var bb = bigreals.float(3.456, 24);
+//aa.precision(3);
+//bb.precision(4);
+console.log("aa = " + aa.toString());
+console.log("bb = " + bb.toString());
+console.log("aa + bb = " + aa.add(bb).toString(10));
+

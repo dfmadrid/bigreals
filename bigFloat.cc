@@ -109,93 +109,61 @@ void bigFloat::Init() {
 
 Handle<Value> bigFloat::getPrecision(Local<String> property, const AccessorInfo &info) {
 
-    Local<Object> self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
-    void* ptr = wrap->Value();
-        long int value = static_cast<config*>(ptr)->precision_;	
-    return Integer::New(value);
+  Local<Object> self = info.Holder();
+  Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
+  void* ptr = wrap->Value();
+      long int value = static_cast<config*>(ptr)->precision_;	
+  return Integer::New(value);
 }
   
 void bigFloat::setPrecision(Local<String> property, Local<Value> value, const AccessorInfo& info) {
 
-    Local<Object> self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
-    void* ptr = wrap->Value();
-        static_cast<config*>(ptr)->precision_ = value->IntegerValue();
+  Local<Object> self = info.Holder();
+  Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
+  void* ptr = wrap->Value();
+      static_cast<config*>(ptr)->precision_ = value->IntegerValue();
   }
 
 Handle<Value> bigFloat::getRmode(Local<String> property, const AccessorInfo &info) {
 
-    Local<Object> self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
-
-    void* ptr = wrap->Value();
-        int value = static_cast<config*>(ptr)->rMode_;
-    return Integer::New(value);
+  Local<Object> self = info.Holder();
+  Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
+  void* ptr = wrap->Value();
+  int value = static_cast<config*>(ptr)->rMode_;
+  return Integer::New(value);
 }
   
 void bigFloat::setRmode(Local<String> property, Local<Value> value, const AccessorInfo& info) {
 
-    Local<Object> self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
-    void* ptr = wrap->Value();
-        static_cast<config*>(ptr)->rMode_ = value->Int32Value();
+  Local<Object> self = info.Holder();
+  Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
+  void* ptr = wrap->Value();
+      static_cast<config*>(ptr)->rMode_ = value->Int32Value();
   }
 
-Handle<Value> bigFloat::applyOpConfig(bigFloat * obj, Local<Value> precision, Local<Value> rMode){
+Handle<Value> bigFloat::getOpArg(Handle<Value> arg, Handle<Value> defaultValue){
 
   HandleScope scope;
 
-  if(!precision->IsUndefined() && precision->IsNumber()){
-    obj->precision_ = (mpfr_prec_t) precision->ToNumber()->Value();
+  if(arg->IsUndefined()){
+    return scope.Close(defaultValue);
   }
-
-  if(!rMode->IsUndefined() && rMode->IsUint32()){
-    if(rMode->ToUint32()->Value() > 4){
+  else if(arg->IsNumber()){
+    return scope.Close(arg);
+  }
+  else if(arg->IsUint32()){
+    if(arg->ToUint32()->Value() > 4){
       ThrowException(Exception::TypeError(String::New("Rounding mode must be either 0, 1, 2, 3, or 4")));
       return scope.Close(Undefined());
     }
-    obj->rMode_ = (mpfr_rnd_t) rMode->ToUint32()->Value();
-      
-  }
-
-  return scope.Close(Undefined());
-
-}
-
-  
-Handle<Value> bigFloat::getOpPrecision(Handle<Value> precHandle, Handle<Number> precision){
-
-  HandleScope scope;
-
-  if(precHandle->IsNumber()){
-    return scope.Close(Number::New(precHandle->ToInteger()->Value()));
-  }
-  else{
-    ThrowException(Exception::TypeError(String::New("Precision must be a long integer")));
-    return scope.Close(Undefined());
-  }
-}
-
-Handle<Value> bigFloat::getOpRmode(Handle<Value> rModeHandle, Handle<Integer> rMode){
-
-  HandleScope scope;
-
-  if(rModeHandle->IsUint32()){
-    rMode = rModeHandle->ToUint32();
-
-    if(rMode->Value() > 4){
-      ThrowException(Exception::TypeError(String::New("Rounding mode must be either 0, 1, 2, 3, or 4")));
-      return scope.Close(Undefined());
+    else{
+      return scope.Close(arg);
     }	
   }
   else{
-    ThrowException(Exception::TypeError(String::New("Rounding mode must be a positive integer")));
+    ThrowException(Exception::TypeError(String::New("Precision must be a long integer and rounding mode must be 0, 1, 2, 3 or 4")));
     return scope.Close(Undefined());
   }
-
-  return scope.Close(Integer::New(rMode->Value()));
-
 }
 
 /* Constructor.
@@ -208,11 +176,11 @@ Handle<Value> bigFloat::New(const Arguments& args){
   HandleScope scope;
   bigFloat *obj = new bigFloat();
   Local<Object> defaults = args.This()->Get(String::New("defaults"))->ToObject();
-  obj->precision_ = (mpfr_prec_t ) defaults->Get(String::New("precision"))->ToInteger()->Value();
-  obj->rMode_ = (mpfr_rnd_t) defaults->Get(String::New("rMode"))->ToInt32()->Value();
+  obj->precision_ = (mpfr_prec_t) defaults->Get(String::New("precision"))->ToNumber()->Value();
+  obj->rMode_ = (mpfr_rnd_t) defaults->Get(String::New("rMode"))->ToUint32()->Value();
   obj->mpFloat_ = new mpfr_t[1];
-  int base = 10;
-  
+  int base = 10, numArgs = args.Length();
+
   if(args[0]->IsExternal()){
     obj->mpFloat_ = (mpfr_t *) External::Unwrap(args[0]);
   }
@@ -220,36 +188,28 @@ Handle<Value> bigFloat::New(const Arguments& args){
     mpfr_init2(*obj->mpFloat_, obj->precision_);
   }
   else if(args[0]->IsNumber()){
-    /*if(args.Length() > 1){
-      obj->precision_ = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) obj->precision_))->ToInteger()->Value();
-      applyOpConfig(obj, 
-      if(args.Length() > 2){
-        obj->rMode_ = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) obj->rMode_))->ToUint32()->Value();
-      }
-*/
-    if(args.Length() > 2){
-      applyOpConfig(obj, args[1], args[1]);
+    if(numArgs > 1){
+      obj->precision_ = (mpfr_prec_t) getOpArg(args[1], Number::New(obj->precision_))->ToNumber()->Value();
     }
-    else if(args.Length() == 2){
-      applyOpConfig(obj, args[1], *Undefined());
+    if(numArgs > 2){
+      obj->rMode_ = (mpfr_rnd_t) getOpArg(args[2], Uint32::New(obj->rMode_))->ToUint32()->Value();
     }
-
     mpfr_init2(*obj->mpFloat_, obj->precision_);
     mpfr_set_d(*obj->mpFloat_, args[0]->ToNumber()->Value(), obj->rMode_);
   }	
   else if(args[0]->IsString()){
-    if(args.Length() > 2){
-      obj->precision_ = (mpfr_prec_t) getOpPrecision(args[2], Number::New((long int) obj->precision_))->ToInteger()->Value();
-      if(args.Length() > 3){
-        obj->rMode_ = (mpfr_rnd_t) getOpRmode(args[3], Integer::New((unsigned int) obj->rMode_))->ToUint32()->Value();
-      }
-    }
     if(args.Length() > 1){
       if(args[1]->IsUint32()){
         base = args[1]->ToUint32()->Value();
         if(base < 2 || base > 62) {
           ThrowException(Exception::Error(String::New("Base must be >= 2 and <= 62. If empty, default is 10")));
           return scope.Close(Undefined());
+        }
+        if(numArgs > 2){
+          obj->precision_ = (mpfr_prec_t) getOpArg(args[2], Number::New(obj->precision_))->ToNumber()->Value();
+        }
+        if(numArgs > 3){
+          obj->rMode_ = (mpfr_rnd_t) getOpArg(args[3], Uint32::New(obj->rMode_))->ToUint32()->Value();
         }
       }
       else{
@@ -274,8 +234,13 @@ Handle<Value> bigFloat::New(const Arguments& args){
 Handle<Value> bigFloat::NewInstance(const Arguments& args) {
   
   HandleScope scope;
-  const unsigned argc = 1;
-  Handle<Value> argv[argc] = { args[0] };
+  int argc = args.Length();
+  Handle<Value> argv[argc];
+
+  for(int cont = 0; cont < argc; cont++){
+    argv[cont] = args[cont];
+  }
+      
   Local<Object> instance = constructor->NewInstance(argc, argv);
   
   return scope.Close(instance);
@@ -284,15 +249,16 @@ Handle<Value> bigFloat::NewInstance(const Arguments& args) {
 
 // Returns a string when object is inspected by console.log().
 
-Handle<Value> bigFloat::inspect(const Arguments& args) {
+Handle<Value> bigFloat::inspect(const Arguments& args){
 
   HandleScope scope;
   bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());	
   mpfr_exp_t *exponent = new mpfr_exp_t[1];
 
-  String::Utf8Value str(String::New(mpfr_get_str(NULL, exponent, 10, obj->precision_, *obj->mpFloat_, obj->rMode_)));
+  String::Utf8Value str(String::New(mpfr_get_str(NULL, exponent, 10, 0, *obj->mpFloat_, obj->rMode_)));
   std::string floatValue = *str;
-  unsigned long int position = (unsigned long int) *exponent;
+  unsigned long position = (unsigned long) *exponent;
+  
   if(floatValue.at(0) == '-'){
     position++;
   }
@@ -320,13 +286,13 @@ Handle<Value> bigFloat::toString(const Arguments& args) {
   HandleScope scope;
   bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
   int base = 10;
-        mpfr_prec_t precision = obj->precision_;
+  size_t numBytes = 0;
   mpfr_rnd_t rMode = obj->rMode_;
     
   if(args.Length() > 1){
-    precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+    numBytes = (size_t) getOpArg(args[1], Number::New(numBytes))->ToInteger()->Value();
     if(args.Length() > 2){
-      rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      rMode = (mpfr_rnd_t) getOpArg(args[2], Integer::New(rMode))->ToUint32()->Value();
     }
   }
   
@@ -343,7 +309,7 @@ Handle<Value> bigFloat::toString(const Arguments& args) {
   }
   
   mpfr_exp_t *exponent = new mpfr_exp_t[1];
-  String::Utf8Value str(String::New(mpfr_get_str(NULL, exponent, base, precision, *obj->mpFloat_, rMode)));
+  String::Utf8Value str(String::New(mpfr_get_str(NULL, exponent, base, numBytes, *obj->mpFloat_, rMode)));
   std::string floatValue = *str;
   unsigned long int position = (unsigned long int) *exponent;
   if(floatValue.at(0) == '-'){
@@ -424,9 +390,9 @@ Handle<Value> bigFloat::add(const Arguments& args) {
   mpfr_rnd_t rMode = obj->rMode_;
     
   if(args.Length() > 1){
-    precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+    precision = (mpfr_prec_t) getOpArg(args[1], Number::New(precision))->ToInteger()->Value();
     if(args.Length() > 2){
-      rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      rMode = (mpfr_rnd_t) getOpArg(args[2], Integer::New(rMode))->ToUint32()->Value();
     }
   }
 
@@ -469,9 +435,9 @@ Handle<Value> bigFloat::sub(const Arguments& args) {
   mpfr_rnd_t rMode = obj->rMode_;
     
   if(args.Length() > 1){
-    precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+    precision = (mpfr_prec_t) getOpArg(args[1], Number::New(precision))->ToInteger()->Value();
     if(args.Length() > 2){
-      rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      rMode = (mpfr_rnd_t) getOpArg(args[2], Integer::New(rMode))->ToUint32()->Value();
     }
   }
 
@@ -514,9 +480,9 @@ Handle<Value> bigFloat::mul(const Arguments& args) {
   mpfr_rnd_t rMode = obj->rMode_;
     
   if(args.Length() > 1){
-    precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+    precision = (mpfr_prec_t) getOpArg(args[1], Number::New(precision))->ToInteger()->Value();
     if(args.Length() > 2){
-      rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      rMode = (mpfr_rnd_t) getOpArg(args[2], Integer::New(rMode))->ToUint32()->Value();
     }
   }
 
@@ -558,9 +524,9 @@ Handle<Value> bigFloat::div(const Arguments& args) {
   mpfr_rnd_t rMode = obj->rMode_;
     
   if(args.Length() > 1){
-    precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+    precision = (mpfr_prec_t) getOpArg(args[1], Number::New(precision))->ToInteger()->Value();
     if(args.Length() > 2){
-      rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      rMode = (mpfr_rnd_t) getOpArg(args[2], Integer::New(rMode))->ToUint32()->Value();
     }
   }
 
@@ -601,9 +567,9 @@ Handle<Value> bigFloat::pow(const Arguments& args) {
   mpfr_rnd_t rMode = obj->rMode_;
     
   if(args.Length() > 1){
-    precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+    precision = (mpfr_prec_t) getOpArg(args[1], Number::New(precision))->ToInteger()->Value();
     if(args.Length() > 2){
-      rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      rMode = (mpfr_rnd_t) getOpArg(args[2], Integer::New(rMode))->ToUint32()->Value();
     }
   }
 
@@ -645,9 +611,9 @@ Handle<Value> bigFloat::root(const Arguments& args) {
   mpfr_rnd_t rMode = obj->rMode_;
     
   if(args.Length() > 1){
-    precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+    precision = (mpfr_prec_t) getOpArg(args[1], Number::New(precision))->ToInteger()->Value();
     if(args.Length() > 2){
-      rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      rMode = (mpfr_rnd_t) getOpArg(args[2], Integer::New(rMode))->ToUint32()->Value();
     }
   }
 
@@ -694,9 +660,9 @@ Handle<Value> bigFloat::ln(const Arguments& args) {
   mpfr_rnd_t rMode = obj->rMode_;
     
   if(args.Length() > 0){
-    precision = (mpfr_prec_t) getOpPrecision(args[0], Number::New((long int) precision))->ToInteger()->Value();
+    precision = (mpfr_prec_t) getOpArg(args[0], Number::New(precision))->ToInteger()->Value();
     if(args.Length() > 1){
-      rMode = (mpfr_rnd_t) getOpRmode(args[1], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      rMode = (mpfr_rnd_t) getOpArg(args[1], Integer::New(rMode))->ToUint32()->Value();
     }
   }
   
@@ -725,9 +691,9 @@ Handle<Value> bigFloat::log(const Arguments& args) {
   mpfr_rnd_t rMode = obj->rMode_;
     
   if(args.Length() > 1){
-    precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+    precision = (mpfr_prec_t) getOpArg(args[1], Number::New(precision))->ToInteger()->Value();
     if(args.Length() > 2){
-      rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      rMode = (mpfr_rnd_t) getOpArg(args[2], Integer::New(rMode))->ToUint32()->Value();
     }
   }
 
@@ -774,9 +740,9 @@ Handle<Value> bigFloat::e(const Arguments& args) {
   mpfr_rnd_t rMode = obj->rMode_;
     
   if(args.Length() > 0){
-    precision = (mpfr_prec_t) getOpPrecision(args[0], Number::New((long int) precision))->ToInteger()->Value();
+    precision = (mpfr_prec_t) getOpArg(args[0], Number::New(precision))->ToInteger()->Value();
     if(args.Length() > 1){
-      rMode = (mpfr_rnd_t) getOpRmode(args[1], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      rMode = (mpfr_rnd_t) getOpArg(args[1], Integer::New(rMode))->ToUint32()->Value();
     }
   }
   
@@ -805,9 +771,9 @@ Handle<Value> bigFloat::exp(const Arguments& args) {
   mpfr_rnd_t rMode = obj->rMode_;
     
   if(args.Length() > 1){
-    precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+    precision = (mpfr_prec_t) getOpArg(args[1], Number::New(precision))->ToInteger()->Value();
     if(args.Length() > 2){
-      rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      rMode = (mpfr_rnd_t) getOpArg(args[2], Integer::New(rMode))->ToUint32()->Value();
     }
   }
 
@@ -850,9 +816,9 @@ Handle<Value> bigFloat::cos(const Arguments& args) {
   
   if(args[0]->IsString()){
     if(args.Length() > 1){
-      precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+      precision = (mpfr_prec_t) getOpArg(args[1], Number::New(precision))->ToInteger()->Value();
       if(args.Length() > 2){
-        rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+        rMode = (mpfr_rnd_t) getOpArg(args[2], Integer::New(rMode))->ToUint32()->Value();
       }
     }
     mpfr_init2(*res, precision);
@@ -876,9 +842,9 @@ Handle<Value> bigFloat::cos(const Arguments& args) {
     mpfr_cos(*res, *obj->mpFloat_, rMode);
   }
   else{
-    precision = (mpfr_prec_t) getOpPrecision(args[0], Number::New((long int) precision))->ToInteger()->Value();
+    precision = (mpfr_prec_t) getOpArg(args[0], Number::New(precision))->ToInteger()->Value();
     if(args.Length() > 1){
-      rMode = (mpfr_rnd_t) getOpRmode(args[1], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      rMode = (mpfr_rnd_t) getOpArg(args[1], Integer::New(rMode))->ToUint32()->Value();
     }
     mpfr_init2(*res, precision);
     mpfr_cos(*res, *obj->mpFloat_, rMode);
@@ -905,9 +871,9 @@ Handle<Value> bigFloat::sin(const Arguments& args) {
   
   if(args[0]->IsString()){
     if(args.Length() > 1){
-      precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+      precision = (mpfr_prec_t) getOpArg(args[1], Number::New(precision))->ToInteger()->Value();
       if(args.Length() > 2){
-        rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+        rMode = (mpfr_rnd_t) getOpArg(args[2], Integer::New(rMode))->ToUint32()->Value();
       }
     }
     mpfr_init2(*res, precision);
@@ -931,9 +897,9 @@ Handle<Value> bigFloat::sin(const Arguments& args) {
     mpfr_sin(*res, *obj->mpFloat_, rMode);
   }
   else{
-    precision = (mpfr_prec_t) getOpPrecision(args[0], Number::New((long int) precision))->ToInteger()->Value();
+    precision = (mpfr_prec_t) getOpArg(args[0], Number::New(precision))->ToInteger()->Value();
     if(args.Length() > 1){
-      rMode = (mpfr_rnd_t) getOpRmode(args[1], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      rMode = (mpfr_rnd_t) getOpArg(args[1], Integer::New(rMode))->ToUint32()->Value();
     }
     mpfr_init2(*res, precision);
     mpfr_sin(*res, *obj->mpFloat_, rMode);
@@ -960,9 +926,9 @@ Handle<Value> bigFloat::tan(const Arguments& args) {
   
   if(args[0]->IsString()){
     if(args.Length() > 1){
-      precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+      precision = (mpfr_prec_t) getOpArg(args[1], Number::New(precision))->ToInteger()->Value();
       if(args.Length() > 2){
-        rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+        rMode = (mpfr_rnd_t) getOpArg(args[2], Integer::New(rMode))->ToUint32()->Value();
       }
     }
     mpfr_init2(*res, precision);
@@ -986,9 +952,9 @@ Handle<Value> bigFloat::tan(const Arguments& args) {
     mpfr_tan(*res, *obj->mpFloat_, rMode);
   }
   else{
-    precision = (mpfr_prec_t) getOpPrecision(args[0], Number::New((long int) precision))->ToInteger()->Value();
+    precision = (mpfr_prec_t) getOpArg(args[0], Number::New(precision))->ToInteger()->Value();
     if(args.Length() > 1){
-      rMode = (mpfr_rnd_t) getOpRmode(args[1], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      rMode = (mpfr_rnd_t) getOpArg(args[1], Integer::New(rMode))->ToUint32()->Value();
     }
     mpfr_init2(*res, precision);
     mpfr_tan(*res, *obj->mpFloat_, rMode);
@@ -1014,9 +980,9 @@ Handle<Value> bigFloat::atan2(const Arguments& args) {
   mpfr_rnd_t rMode = obj->rMode_;
     
   if(args.Length() > 1){
-    precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+    precision = (mpfr_prec_t) getOpArg(args[1], Number::New(precision))->ToInteger()->Value();
     if(args.Length() > 2){
-      rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      rMode = (mpfr_rnd_t) getOpArg(args[2], Integer::New(rMode))->ToUint32()->Value();
     }
   }
 
@@ -1055,9 +1021,9 @@ Handle<Value> bigFloat::sec(const Arguments& args) {
   
   if(args[0]->IsString()){
     if(args.Length() > 1){
-      precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+      precision = (mpfr_prec_t) getOpArg(args[1], Number::New(precision))->ToInteger()->Value();
       if(args.Length() > 2){
-        rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+        rMode = (mpfr_rnd_t) getOpArg(args[2], Integer::New(rMode))->ToUint32()->Value();
       }
     }
     mpfr_init2(*res, precision);
@@ -1075,9 +1041,9 @@ Handle<Value> bigFloat::sec(const Arguments& args) {
     mpfr_sec(*res, *obj->mpFloat_, rMode);
   }
   else{
-    precision = (mpfr_prec_t) getOpPrecision(args[0], Number::New((long int) precision))->ToInteger()->Value();
+    precision = (mpfr_prec_t) getOpArg(args[0], Number::New(precision))->ToInteger()->Value();
     if(args.Length() > 1){
-      rMode = (mpfr_rnd_t) getOpRmode(args[1], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      rMode = (mpfr_rnd_t) getOpArg(args[1], Integer::New(rMode))->ToUint32()->Value();
     }
     mpfr_init2(*res, precision);
     mpfr_sec(*res, *obj->mpFloat_, rMode);
@@ -1104,9 +1070,9 @@ Handle<Value> bigFloat::cosec(const Arguments& args) {
   
   if(args[0]->IsString()){
     if(args.Length() > 1){
-      precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+      precision = (mpfr_prec_t) getOpArg(args[1], Number::New(precision))->ToInteger()->Value();
       if(args.Length() > 2){
-        rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+        rMode = (mpfr_rnd_t) getOpArg(args[2], Integer::New(rMode))->ToUint32()->Value();
       }
     }
     mpfr_init2(*res, precision);
@@ -1124,9 +1090,9 @@ Handle<Value> bigFloat::cosec(const Arguments& args) {
     mpfr_csc(*res, *obj->mpFloat_, rMode);
   }
   else{
-    precision = (mpfr_prec_t) getOpPrecision(args[0], Number::New((long int) precision))->ToInteger()->Value();
+    precision = (mpfr_prec_t) getOpArg(args[0], Number::New(precision))->ToInteger()->Value();
     if(args.Length() > 1){
-      rMode = (mpfr_rnd_t) getOpRmode(args[1], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      rMode = (mpfr_rnd_t) getOpArg(args[1], Integer::New(rMode))->ToUint32()->Value();
     }
     mpfr_init2(*res, precision);
     mpfr_csc(*res, *obj->mpFloat_, rMode);
@@ -1153,9 +1119,9 @@ Handle<Value> bigFloat::cotan(const Arguments& args) {
   
   if(args[0]->IsString()){
     if(args.Length() > 1){
-      precision = (mpfr_prec_t) getOpPrecision(args[1], Number::New((long int) precision))->ToInteger()->Value();
+      precision = (mpfr_prec_t) getOpArg(args[1], Number::New(precision))->ToInteger()->Value();
       if(args.Length() > 2){
-        rMode = (mpfr_rnd_t) getOpRmode(args[2], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+        rMode = (mpfr_rnd_t) getOpArg(args[2], Integer::New(rMode))->ToUint32()->Value();
       }
     }
     mpfr_init2(*res, precision);
@@ -1173,9 +1139,9 @@ Handle<Value> bigFloat::cotan(const Arguments& args) {
     mpfr_coth(*res, *obj->mpFloat_, rMode);
   }
   else{
-    precision = (mpfr_prec_t) getOpPrecision(args[0], Number::New((long int) precision))->ToInteger()->Value();
+    precision = (mpfr_prec_t) getOpArg(args[0], Number::New(precision))->ToInteger()->Value();
     if(args.Length() > 1){
-      rMode = (mpfr_rnd_t) getOpRmode(args[1], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      rMode = (mpfr_rnd_t) getOpArg(args[1], Integer::New(rMode))->ToUint32()->Value();
     }
     mpfr_init2(*res, precision);
     mpfr_coth(*res, *obj->mpFloat_, rMode);
@@ -1200,9 +1166,9 @@ Handle<Value> bigFloat::fac(const Arguments& args) {
   mpfr_rnd_t rMode = obj->rMode_;
     
   if(args.Length() > 0){
-    precision = (mpfr_prec_t) getOpPrecision(args[0], Number::New((long int) precision))->ToInteger()->Value();
+    precision = (mpfr_prec_t) getOpArg(args[0], Number::New(precision))->ToInteger()->Value();
     if(args.Length() > 2){
-      rMode = (mpfr_rnd_t) getOpRmode(args[1], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      rMode = (mpfr_rnd_t) getOpArg(args[1], Integer::New(rMode))->ToUint32()->Value();
     }
   }
   mpfr_init2(*res, precision);
@@ -1252,7 +1218,7 @@ Handle<Value> bigFloat::abs(const Arguments& args) {
   mpfr_rnd_t rMode = obj->rMode_;
     
   if(args.Length() > 0){
-      rMode = (mpfr_rnd_t) getOpRmode(args[0], Integer::New((unsigned int) rMode))->ToUint32()->Value();
+      rMode = (mpfr_rnd_t) getOpArg(args[0], Integer::New(rMode))->ToUint32()->Value();
   }
   
   mpfr_init2(*res, precision);	
