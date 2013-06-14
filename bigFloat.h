@@ -48,6 +48,8 @@ class bigFloat : public node::ObjectWrap {
 		static v8::Handle<v8::Value> cosec(const v8::Arguments& args);
 		static v8::Handle<v8::Value> cotan(const v8::Arguments& args);
 		static v8::Handle<v8::Value> fac(const v8::Arguments& args);
+		static v8::Handle<v8::Value> agmean(const v8::Arguments& args);
+		static v8::Handle<v8::Value> eunorm(const v8::Arguments& args);
 		static v8::Handle<v8::Value> whatIs(const v8::Arguments& args);
 		static v8::Handle<v8::Value> isRegular(const v8::Arguments& args);
 		static v8::Handle<v8::Value> isOrdinary(const v8::Arguments& args);
