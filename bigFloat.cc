@@ -7,7 +7,6 @@
 #endif
 
 #include <node.h>
-#include <sstream>
 #include <string>
 #include <gmp.h>
 #include <mpfr.h>
@@ -148,9 +147,8 @@ void config::setRmode(Local<String> property, Local<Value> value, const Accessor
 Handle<Value> bigFloat::getOpArg(int index, std::string type, const Arguments& args, Handle<Value> defaultValue){
 
   HandleScope scope;
-  std::ostringstream converter;
-  converter << index;
-  std::string error = "Argument" + converter.str() + " must be ";
+  Local<String> strStart = String::Concat(String::Concat(String::New("Argument"), Uint32::New(index)->ToString()), String::New(" must be "));
+  Local<String> strEnd;
 
   if(index < args.Length()){
     if(type == "External"){
@@ -165,20 +163,16 @@ Handle<Value> bigFloat::getOpArg(int index, std::string type, const Arguments& a
       if(args[index]->IsInt32()){
         return scope.Close(args[index]);
       }
-      error += "a 32 bits Integer. Default value is ";
-      converter << defaultValue->Int32Value();
-      error += converter.str();
-      ThrowException(Exception::Error(String::New(error.c_str())));
+      strEnd = String::Concat(String:: New("a 32 bits integer. Default value is "), defaultValue->ToString());
+      ThrowException(Exception::Error(String::Concat(strStart, strEnd)));
       return scope.Close(Undefined());
     }
     else if(type == "Uint32"){
       if(args[index]->IsUint32()){
         return scope.Close(args[index]);
       }
-      error += "a 32 bits Unsigned Integer. Default value is ";
-      converter << defaultValue->Uint32Value();
-      error += converter.str();
-      ThrowException(Exception::Error(String::New(error.c_str())));
+      strEnd = String::Concat(String:: New("a 32 bits unsigned integer. Default value is "), defaultValue->ToString());
+      ThrowException(Exception::Error(String::Concat(strStart, strEnd)));
       return scope.Close(Undefined());
     }
     else if(type == "String" && args[index]->IsString()){
@@ -217,16 +211,17 @@ Handle<Value> bigFloat::New(const Arguments& args){
     mpfr_set_d(*obj->mpFloat_, args[0]->NumberValue(), obj->rMode_);
   }	
   else if(args[0]->IsString()){
-    Local<String> argString = args[0]->ToString();
-    Local<String> Pi = String::New("Pi");
-    Local<String> Catalan = String::New("Catalan");
-    Local<String> Euler = String::New("Euler");
+    String::Utf8Value str(args[0]->ToString());
+    std::string argString = *str;
+    std::string Pi ("Pi");
+    std::string Catalan ("Catalan");
+    std::string Euler ("Euler");
     
     if(argString == Pi || argString == Catalan || argString == Euler){
-      obj->precision_ = (mpfr_prec_t) getOpArg(2, "Number", args, Number::New(obj->precision_))->NumberValue();
-      obj->rMode_ = (mpfr_rnd_t) getOpArg(3, "Uint32", args, Uint32::New(obj->rMode_))->Uint32Value();
+      obj->precision_ = (mpfr_prec_t) getOpArg(1, "Number", args, Number::New(obj->precision_))->NumberValue();
+      obj->rMode_ = (mpfr_rnd_t) getOpArg(2, "Uint32", args, Uint32::New(obj->rMode_))->Uint32Value();
       mpfr_init2(*obj->mpFloat_, obj->precision_);
-    
+      
       if(argString == Pi){
         mpfr_const_pi(*obj->mpFloat_, obj->rMode_);
       }
@@ -236,7 +231,7 @@ Handle<Value> bigFloat::New(const Arguments& args){
       if(argString == Euler){
         mpfr_const_euler(*obj->mpFloat_, obj->rMode_);
       }
-      mpfr_free_cache();
+    
     }
     else{
       base = getOpArg(1, "Uint32", args, Uint32::New(10))->Uint32Value();
@@ -248,7 +243,6 @@ Handle<Value> bigFloat::New(const Arguments& args){
       obj->precision_ = (mpfr_prec_t) getOpArg(2, "Number", args, Number::New(obj->precision_))->NumberValue();
       obj->rMode_ = (mpfr_rnd_t) getOpArg(3, "Uint32", args, Uint32::New(obj->rMode_))->Uint32Value();	
       mpfr_init2(*obj->mpFloat_, obj->precision_);
-      String::Utf8Value str(argString);
       mpfr_set_str(*obj->mpFloat_, *str, base, obj->rMode_);
     }
   }
@@ -286,21 +280,20 @@ Handle<Value> bigFloat::inspect(const Arguments& args){
   bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());	
   mpfr_exp_t *exponent = new mpfr_exp_t[1];
 
-  String::Utf8Value str(String::New(mpfr_get_str(NULL, exponent, 10, 0, *obj->mpFloat_, obj->rMode_)));
-  std::string floatValue = *str;
+  std::string realValue(mpfr_get_str(NULL, exponent, 10, 0, *obj->mpFloat_, obj->rMode_));
   unsigned long position = (unsigned long) *exponent;
   
-  if(floatValue.at(0) == '-'){
+  if(realValue.at(0) == '-'){
     position++;
   }
-  if(position < floatValue.length()){
-    floatValue.insert(position, ".");
+  if(position < realValue.length()){
+    realValue.insert(position, ".");
   }
-  if(floatValue.at(0) == '-'){
+  if(realValue.at(0) == '-'){
     position++;
   }
 
-  Local<String> base = String::Concat(String::New("{ bigFloat: "), String::New(floatValue.c_str()));
+  Local<String> base = String::Concat(String::New("{ bigFloat: "), String::New(realValue.c_str()));
   Local<String> precision = String::Concat(String::New(" , precision: "), Number::New((long int) obj->precision_)->ToString());
   Local<String> type = String::Concat(String::Concat(base, precision), String::New(" }"));
 
@@ -330,17 +323,16 @@ Handle<Value> bigFloat::toString(const Arguments& args) {
   }
   
   mpfr_exp_t *exponent = new mpfr_exp_t[1];
-  String::Utf8Value str(String::New(mpfr_get_str(NULL, exponent, base, numBytes, *obj->mpFloat_, rMode)));
-  std::string floatValue = *str;
+  std::string realValue(mpfr_get_str(NULL, exponent, base, numBytes, *obj->mpFloat_, rMode));
   unsigned long int position = (unsigned long int) *exponent;
-  if(floatValue.at(0) == '-'){
+  if(realValue.at(0) == '-'){
     position++;
   }
-  if(position < floatValue.length()){
-    floatValue.insert(position, ".");
+  if(position < realValue.length()){
+    realValue.insert(position, ".");
   }
-
-  return scope.Close(String::New(floatValue.c_str()));
+  
+  return scope.Close(String::New(realValue.c_str()));
 }
 
 /* Gets or sets the precision of the Irrational number.
@@ -791,15 +783,19 @@ Handle<Value> bigFloat::cos(const Arguments& args) {
     precision = (mpfr_prec_t) getOpArg(1, "Number", args, Number::New(precision))->NumberValue();
     rMode = (mpfr_rnd_t) getOpArg(2, "Uint32", args, Uint32::New(rMode))->Uint32Value();
     mpfr_init2(*res, precision);
-    cosType = args[0]->ToString();
+    String::Utf8Value str(args[0]->ToString());
+    std::string cosType = *str;
+    std::string arc("arc");
+    std::string hyp("hyp");
+    std::string invhyp("invhyp");
   
-    if(cosType == String::New("arc")){
+    if(cosType == arc){
       mpfr_acos(*res, *obj->mpFloat_, rMode);
     }
-    else if(cosType == String::New("hyp")){
+    else if(cosType == hyp){
       mpfr_cosh(*res, *obj->mpFloat_, rMode);
     }
-    else if(cosType == String::New("invhyp")){
+    else if(cosType == invhyp){
       mpfr_acosh(*res, *obj->mpFloat_, rMode);
     }
     else{
@@ -841,15 +837,19 @@ Handle<Value> bigFloat::sin(const Arguments& args) {
     precision = (mpfr_prec_t) getOpArg(1, "Number", args, Number::New(precision))->NumberValue();
     rMode = (mpfr_rnd_t) getOpArg(2, "Uint32", args, Uint32::New(rMode))->Uint32Value();
     mpfr_init2(*res, precision);
-    sineType = args[0]->ToString();
-    
-    if(sineType == String::New("arc")){
+    String::Utf8Value str(args[0]->ToString());
+    std::string sinType = *str;
+    std::string arc("arc");
+    std::string hyp("hyp");
+    std::string invhyp("invhyp");
+  
+    if(sinType == arc){
       mpfr_asin(*res, *obj->mpFloat_, rMode);
     }
-    else if(sineType == String::New("hyp")){
+    else if(sinType == hyp){
       mpfr_sinh(*res, *obj->mpFloat_, rMode);
     }
-    else if(sineType == String::New("invhyp")){
+    else if(sinType == invhyp){
       mpfr_asinh(*res, *obj->mpFloat_, rMode);
     }
     else{
@@ -891,15 +891,19 @@ Handle<Value> bigFloat::tan(const Arguments& args) {
     precision = (mpfr_prec_t) getOpArg(1, "Number", args, Number::New(precision))->NumberValue();
     rMode = (mpfr_rnd_t) getOpArg(2, "Uint32", args, Uint32::New(rMode))->Uint32Value();
     mpfr_init2(*res, precision);
-    tanType = args[0]->ToString();
-
-    if(tanType == String::New("arc")){
+    String::Utf8Value str(args[0]->ToString());
+    std::string tanType = *str;
+    std::string arc("arc");
+    std::string hyp("hyp");
+    std::string invhyp("invhyp");
+  
+    if(tanType == arc){
       mpfr_atan(*res, *obj->mpFloat_, rMode);
     }
-    else if(tanType == String::New("hyp")){
+    else if(tanType == hyp){
       mpfr_tanh(*res, *obj->mpFloat_, rMode);
     }
-    else if(tanType == String::New("invhyp")){
+    else if(tanType == invhyp){
       mpfr_atanh(*res, *obj->mpFloat_, rMode);
     }
     else{
@@ -977,9 +981,11 @@ Handle<Value> bigFloat::sec(const Arguments& args) {
     precision = (mpfr_prec_t) getOpArg(1, "Number", args, Number::New(precision))->NumberValue();
     rMode = (mpfr_rnd_t) getOpArg(2, "Uint32", args, Uint32::New(rMode))->Uint32Value();
     mpfr_init2(*res, precision);
-    secType = args[0]->ToString();
+    String::Utf8Value str(args[0]->ToString());
+    std::string secType = *str;
+    std::string hyp("hyp");
 
-    if(secType == String::New("hyp")){
+    if(secType == hyp){
       mpfr_sech(*res, *obj->mpFloat_, rMode);
     }
     else{
@@ -1021,9 +1027,11 @@ Handle<Value> bigFloat::cosec(const Arguments& args) {
     precision = (mpfr_prec_t) getOpArg(1, "Number", args, Number::New(precision))->NumberValue();
     rMode = (mpfr_rnd_t) getOpArg(2, "Uint32", args, Uint32::New(rMode))->Uint32Value();
     mpfr_init2(*res, precision);
-    cosecType = args[0]->ToString();
+    String::Utf8Value str(args[0]->ToString());
+    std::string cosecType = *str;
+    std::string hyp("hyp");
 
-    if(cosecType == String::New("hyp")){
+    if(cosecType == hyp){
       mpfr_csch(*res, *obj->mpFloat_, rMode);
     }
     else{
@@ -1065,9 +1073,11 @@ Handle<Value> bigFloat::cotan(const Arguments& args) {
     precision = (mpfr_prec_t) getOpArg(1, "Number", args, Number::New(precision))->NumberValue();
     rMode = (mpfr_rnd_t) getOpArg(2, "Uint32", args, Uint32::New(rMode))->Uint32Value();
     mpfr_init2(*res, precision);
-    cotanType = args[0]->ToString();
+    String::Utf8Value str(args[0]->ToString());
+    std::string cotanType = *str;
+    std::string hyp("hyp");
 
-    if(cotanType == String::New("hyp")){
+    if(cotanType == hyp){
       mpfr_coth(*res, *obj->mpFloat_, rMode);
     }
     else{
