@@ -1,4 +1,4 @@
-#BigReals Irrationals
+# BigReals Irrationals
 
 BigReals uses [GNU's MPFR](http://www.mpft.org "MPFR") for infinite precision fast calculations over irrationals numbers.
 This chapter discusses the special interface of BigReals to MPFR and how to use it.
@@ -17,8 +17,8 @@ This chapter discusses the special interface of BigReals to MPFR and how to use 
 
 ###<a name="precision">Precision</a>
 
-Precision is the of number bits used by BigReals to store internally an irrational number and could be any number between 2 and the maximum unsigned long integer value
-allowed by your processor. By default, each bigReal number is created with a precision of 53 bits. This value can be changed by modifying the defaults object of the factory/module:
+Precision is the of number bits used by BigReals to store internally an irrational number and could be any number between 2 and the maximum unsigned integer value
+allowed by your processor. By default, each bigReal number is created with a precision of 53 bits. This value can be changed by modifying the *precision* property of the object *defaults* of the factory/module:
 
     var bigReals = require('bigreals');
 
@@ -28,7 +28,7 @@ allowed by your processor. By default, each bigReal number is created with a pre
 
     bigReals.defaults.precision = 100;
 
-This default configuration can be overriden in a specific number by specifying a precision upon initialization:
+This default precision can be overriden in a specific number by specifying a precision upon initialization:
 
     var bigReals = require('bigreals');
 
@@ -53,7 +53,6 @@ higher of the operands' precisions:
 This behaviour can be overriden by specifying a precision as argument of the calculation:
    
     var bigReals = require('bigreals');
-
     var op1 = bigReals(4.0, 16);
     var op2 = bigReals(6.55, 32);
 
@@ -61,13 +60,86 @@ This behaviour can be overriden by specifying a precision as argument of the cal
 
     console.log(op1.add(op2, 24);
 
+You can get or set the precision of a bigReal number by using the *precision()* function:
+
+    var bigReals = require('bigreals');
+    var op = bigReals(4.0);
+
+    console.log("Precision of op is = " + op.precision();
+    op.precision(5000);
+    console.log("New precision of op is = " + op.precision());
+
 ---
 
 ###<a name="rounding">Rounding Mode</a>
 
+Rounding mode speficies the way to round the result of a calculation in case rounding is needed. The four allowed modes in BigReals are the same than MPFR ones:
+
+*   0 (MPFR_RNDN: round to nearest)
+*   1 (MPFR_RNDZ: round toward zero)
+*   2 (MPFR_RNDU: round toward plus infinity)
+*   3 (MPFR_RNDD: round toward minus infinity)
+*   4 (MPFR_RNDA: round away from zero)
+
+Each BigReals irrational number has associated a rounding mode with it, the default mode is 0 (round to nearest). This default mode can be settled for all
+irrational numbers created with bigReals by changing the *rMode* property of the object defaults of the factory/module:
+
+    var bigReals = require('bigreals');
+
+    /* Settles the default rounding mode to round toward minus infinity for new numbers created.
+     * Previously created numbers are not affected by this change.
+     */
+
+    bigReals.defaults.rMode = 3;
+
+This default rounding mode can be overriden for a particular bigReals irrational upon initialization:
+
+    var bigReals = require('bigreals');
+
+    // Creates a 16 bits precision irrational number with value 4.0 and rounding mode 3.
+
+    var op = bigReals(4.0, 16, 3);
+
+You can get or set the rounding mode of a bigReals irrational number by using the *rMode()* function:
+
+    var bigReals = require('bigreals');
+    var op = bigReals(4.0);
+
+    console.log("Rounding mode of op is = " + op.rMode();
+    op.rMode(3);
+    console.log("New rounding mode of op is = " + op.rMode());
+
 ---
 
 ###<a name="initialization">Initialization</a>
+
+A bigReals irrational number can be initialized with a long integer value, a double value or a string and optionally a precision and rounding mode. In the case of double values, you can use
+dot notation or floating point notation:
+
+    var bigReals = require('bigreals');
+    var op1 = bigReals(4.04324324, 32, 3);
+    var op2 = bigReals(655e-2, 24);
+    var op3 = bigReals(45050003);
+
+    // Outputs the internal representation of the three bigReals object as the one MPFR would need to represent the object rounding to the nearest.
+
+    console.log(op1);
+    console.log(op2);
+    console.log(op3);
+
+In the case of strings, any string representing a number could be provided, the only limit is the memory available in your system. Optionally a base of the string representation could be
+provided. To specify a precision and/or rounding mode for the BigReal irrational number, the base is a mandatory argument:
+
+    var bigReals = require('bigreals');
+    var op1 = bigReals("312321785473984758923758943759843759438753984753984753894754398759834759834759", 10, 5000);
+    var op2 = bigReals("3f45665bac.45fbae3d", 16);
+    var op3 = bigReals("4.5050003", 10, 32, 3);
+
+    // Outputs the internal representation of the three bigReals object as the one MPFR would need to represent the object rounding to the nearest.
+
+    console.log(op1);
+    console.log(op2);
+    console.log(op3);
 
 ---
 
@@ -86,4 +158,3 @@ This behaviour can be overriden by specifying a precision as argument of the cal
 ###<a name="other">Other functions</a>
 
 ---
-
