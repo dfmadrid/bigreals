@@ -1,6 +1,6 @@
 # BigReals Irrationals
 
-BigReals uses [GNU's MPFR](http://www.mpft.org "MPFR") for infinite precision fast calculations over irrationals numbers.
+BigReals uses [GNU's MPFR](http://www.mpft.org "MPFR") for multi-precision fast calculations over irrationals numbers.
 This chapter discusses the special interface of BigReals to MPFR and how to use it.
 
 ## Contents
@@ -121,8 +121,10 @@ dot notation or floating point notation:
     var op2 = bigReals(655e-2, 24);
     var op3 = bigReals(45050003);
 
-    // Outputs the internal representation of the three bigReals object as the one MPFR would need to represent the object rounding to the nearest.
-
+    /* Outputs the internal representation of the three bigReals object as the one MPFR would need to represent the
+     * object rounding to the nearest.
+     */
+     
     console.log(op1);
     console.log(op2);
     console.log(op3);
@@ -135,16 +137,44 @@ provided. To specify a precision and/or rounding mode for the BigReal irrational
     var op2 = bigReals("3f45665bac.45fbae3d", 16);
     var op3 = bigReals("4.5050003", 10, 32, 3);
 
-    // Outputs the internal representation of the three bigReals object as the one MPFR would need to represent the object rounding to the nearest.
+    /* Outputs the internal representation of the three bigReals object as the one MPFR would need to represent the 
+     * object rounding to the nearest.
+     */
 
     console.log(op1);
     console.log(op2);
     console.log(op3);
 
+Irrationals are composed of decimal numbers plus special numbers like Pi, Euler and Catalan constants, so bigReals
+supports initialization to any of those constants with an optional precision and rounding mode:
+
+    var bigReals = require('bigreals');
+    var pi = bigReals("Pi", 100);
+    var cat = bigReals("Catalan");
+    var e = bigREals("Euler");
+    
+    console.log(pi);
+    console.log(cat);
+    console.log(e);
+    
 ---
 
 ###<a name="arithmetics">Basic Arithmetics</a>
 
+BigReals supports basic arithmetic calculations like addition(*add*), substracction(*sub*), multiplication(*mul*), and division(*div*).
+All the functions follow the same pattern in relation to arguments allowed, they accept either a double, a long int or another 
+bigReal object. The result of the calculation is another bigReal object, so operations can be concatenated:
+
+    var bigReals = require('bigreals');
+    var op1 = bigReals(12.32345);
+    var op2 = bigReals(5.4353454);
+    var op3 = bigReals(234.34);
+    
+    console.log(op1.add(100));
+    console.log(op3.add(0.66));
+    console.log(op2.mul(10));
+    console.log(op3.div(op2).sub(2.57));
+    
 ---
 
 ###<a name="logexp">Exponentation, roots and logarithms</a>
