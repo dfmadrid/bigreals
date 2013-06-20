@@ -161,9 +161,9 @@ supports initialization to any of those constants with an optional precision and
 
 ###<a name="arithmetics">Basic Arithmetics</a>
 
-BigReals supports basic arithmetic calculations like addition(*add*), substracction(*sub*), multiplication(*mul*), and division(*div*).
+BigReals supports basic arithmetic calculations like addition(function *add*), substracction(function *sub*), multiplication(function *mul*), and division(function *div*).
 All the functions follow the same pattern in relation to arguments allowed, they accept either a double, a long int or another 
-bigReal object. The result of the calculation is another bigReal object, so operations can be concatenated:
+bigReal object with an optional precision and rounding mode of the calculation. The result of the calculation is another bigReal object, so operations can be concatenated:
 
     var bigReals = require('bigreals');
     var op1 = bigReals(12.32345);
@@ -178,6 +178,46 @@ bigReal object. The result of the calculation is another bigReal object, so oper
 ---
 
 ###<a name="logexp">Exponentation, roots and logarithms</a>
+
+To calculate the n-th power or the n-th root of a bigReal number, functions *pow* and *root* accept as exponent a double, a long integer (which will be casted to a
+double internally) or another bigReal number. Optionally a precision and rounding mode of the calculation could be supplied:
+
+    var bigReals = require('bigreals');
+    var op1 = bigReals(9);
+    var op2 = bigReals(12);
+    var op3 = bigReals(3);
+    
+    console.log(op1.root(3));
+    console.log(op2.pow(op3));
+    console.log(op2.root(2, 100));
+    console.log(op2.root(2).pow(2));
+
+To quickly raise Euler's constant, 2 or 10 to the power of a bigReal number, you could use the *e* function and the *exp* functions. *e* will calculate the power
+base Euler's constant and *exp* base 2 or 10, as supplied as argument. In both cases, an optional precision and rounding mode could be provided:
+
+    var bigReals = require('bigreals');
+    var op1 = bigReals(9);
+    var op2 = bigReals(12);
+    var op3 = bigReals(3);
+    
+    console.log(op1.e());
+    console.log(op2.e(100));
+    console.log(op2.exp(2));
+    console.log(op2.exp(10, op3));
+
+Similarly to *e* and *exp*, *ln* and *log* will calculate the natural/Naiperian logarithm and base 2 or base 10 logarithm of a bigReal number:
+
+    var bigReals = require('bigreals');
+    var op1 = bigReals(9);
+    var op2 = bigReals(12);
+    var op3 = bigReals(3);
+    
+    console.log(op1.ln());
+    console.log(op2.ln(100));
+    console.log(op2.log(2));
+    console.log(op2.log(10, op3));
+
+Please note that calculation of logarithms could be computatinally intensive in some domains involving large numbers.
 
 ---
 
