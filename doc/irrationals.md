@@ -6,11 +6,12 @@ This chapter discusses the special interface of BigReals to MPFR and how to use 
 ## Contents
 
 *   [Precision](#precision)
-*   [Rounding Mode](#rounding)
+*   [Rounding mode](#rounding)
 *   [Initialization](#initialization)
-*   [Basic Arithmetics](#arithmetics)
+*   [Basic arithmetics](#arithmetics)
 *   [Exponentiation, roots and logarithms](#logexp)
-*   [Equations](#equations)
+*   [Trigonometry](#trigonometry)
+*   [Number theory](#numbertheory)
 *   [Other functions](#other)
 
 ---
@@ -151,11 +152,11 @@ supports initialization to any of those constants with an optional precision and
     var bigReals = require('bigreals');
     var pi = bigReals("Pi", 100);
     var cat = bigReals("Catalan");
-    var e = bigREals("Euler");
+    var euler = bigREals("Euler");
     
     console.log(pi);
     console.log(cat);
-    console.log(e);
+    console.log(euler);
     
 ---
 
@@ -192,7 +193,7 @@ double internally) or another bigReal number. Optionally a precision and roundin
     console.log(op2.root(2, 100));
     console.log(op2.root(2).pow(2));
 
-To quickly raise Euler's constant, 2 or 10 to the power of a bigReal number, you could use the *e* function and the *exp* functions. *e* will calculate the power
+To quickly raise Euler's number, 2 or 10 to the power of a bigReal number, you could use the *e* function and the *exp* functions. *e* will calculate the power
 base Euler's constant and *exp* base 2 or 10, as supplied as argument. In both cases, an optional precision and rounding mode could be provided:
 
     var bigReals = require('bigreals');
@@ -217,11 +218,30 @@ Similarly to *e* and *exp*, *ln* and *log* will calculate the natural/Naiperian 
     console.log(op2.log(2));
     console.log(op2.log(10, op3));
 
-Please note that calculation of logarithms could be computatinally intensive in some domains involving large numbers.
+Please note that calculation of logarithms could be computationally intensive in some domains involving large numbers.
 
 ---
 
-###<a namef="equations">Equations</a>
+###<a namef="trigonometry">Trigonometry</a>
+
+*cos*, *sin*, *tan*, *sec*, *cosec* and *cotan* functions allow to do trigonometric calculations over a bigReal number. All follow the same
+pattern in relation to arguments. If no string is provided as argument a normal trigonometric calculation will be executed. If you want to
+calculate the inverse("arc"), the hyperbolic("hyp" or the inverse hyperbolic("invhyp") version of the function, just supply the string as
+argument. In all the cases, an optional precision and rounding mode could be provided:
+ 
+    var bigReals = require('bigreals');
+    var op1 = bigReals("Pi", 100);
+    var op2 = bigReals(12);
+    var op3 = bigReals(3);
+    
+    console.log(op1.cos());
+    console.log(op2.sec("hyp"));
+    console.log(op3.tan(100));
+    console.log(op2.("invghyp", 100));
+
+---
+
+###<a namef="numbertheory">Number theory</a>
 
 ---
 
