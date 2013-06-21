@@ -226,7 +226,7 @@ Please note that calculation of logarithms could be computationally intensive in
 
 *cos*, *sin*, *tan*, *sec*, *cosec* and *cotan* functions allow to do trigonometric calculations over a bigReal number. All follow the same
 pattern in relation to arguments. If no string is provided as argument a normal trigonometric calculation will be executed. If you want to
-calculate the inverse("arc"), the hyperbolic("hyp" or the inverse hyperbolic("invhyp") version of the function, just supply the string as
+calculate the inverse("arc"), the hyperbolic("hyp") or the inverse hyperbolic("invhyp") version of the function, just supply the string as
 argument. In all the cases, an optional precision and rounding mode could be provided:
  
     var bigReals = require('bigreals');
@@ -237,7 +237,7 @@ argument. In all the cases, an optional precision and rounding mode could be pro
     console.log(op1.cos());
     console.log(op2.sec("hyp"));
     console.log(op3.tan(100));
-    console.log(op2.("invghyp", 100));
+    console.log(op2.("invhyp", 100));
 
 ---
 
