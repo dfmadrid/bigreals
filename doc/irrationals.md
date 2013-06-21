@@ -247,4 +247,28 @@ argument. In all the cases, an optional precision and rounding mode could be pro
 
 ###<a name="other">Other functions</a>
 
+To calculate the factorial or absolute value of a bigReals number, you could use *fac* and *abs* functions. In the case of *fac* function,
+an optional precision and rounding mode could be provided and in the case of *abs* and optional rounding mode of the calculation:
+
+    var bigReals = require('bigreals');
+    var op1 = bigReals(20);
+    var op2 = bigReals(12.57);
+    var op3 = bigReals(-23456.45678);
+    
+    console.log(op1.fac);
+    console.log(op2.fac(100));
+    console.log(op3.abs());
+
+To compare a bigReals number with a normal number or another bigReals number, you could use the function *cmp*, which will return 0 if
+both numbers are equal, 1 if the bigReals number is bigger than the operando or -1 otherwise:
+
+    var bigReals = require('bigreals');
+    var op1 = bigReals(12.57);
+    var op2 = bigReals(12.57);
+    var op3 = bigReals(-23456.45678);
+    
+    console.log(op1.cmp(op2));
+    console.log(op2.cmp(op3));
+    console.log(op3.cmp(-0.45877));
+
 ---
