@@ -95,14 +95,24 @@ void bigFloat::Init() {
     FunctionTemplate::New(cotan)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("fac"),
     FunctionTemplate::New(fac)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("toInt"),
+    FunctionTemplate::New(toInt)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("mod"),
+    FunctionTemplate::New(mod)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("agMean"),
     FunctionTemplate::New(agMean)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("riemannZ"),
+    FunctionTemplate::New(riemannZ)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("gamma"),
+    FunctionTemplate::New(gamma)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("euNorm"),
     FunctionTemplate::New(euNorm)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("whatIs"),
     FunctionTemplate::New(whatIs)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("isRegular"),
     FunctionTemplate::New(isRegular)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("isInteger"),
+    FunctionTemplate::New(isInteger)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("isOrdinary"),
     FunctionTemplate::New(isOrdinary)->GetFunction());
 
@@ -200,6 +210,8 @@ Handle<Value> bigFloat::New(const Arguments& args){
 
   if(args[0]->IsExternal()){
     obj->mpFloat_ = (mpfr_t *) External::Unwrap(args[0]);
+    obj->precision_ = (mpfr_prec_t) getOpArg(1, "Number", args, Number::New(obj->precision_))->NumberValue();
+    obj->rMode_ = (mpfr_rnd_t) getOpArg(2, "Uint32", args, Uint32::New(obj->rMode_))->Uint32Value();
   }
   else if(args[0]->IsUndefined()){
     mpfr_init2(*obj->mpFloat_, obj->precision_);
@@ -289,9 +301,6 @@ Handle<Value> bigFloat::inspect(const Arguments& args){
   if(position < realValue.length()){
     realValue.insert(position, ".");
   }
-  if(realValue.at(0) == '-'){
-    position++;
-  }
 
   Local<String> base = String::Concat(String::New("{ bigFloat: "), String::New(realValue.c_str()));
   Local<String> precision = String::Concat(String::New(" , precision: "), Number::New((long int) obj->precision_)->ToString());
@@ -313,7 +322,7 @@ Handle<Value> bigFloat::toString(const Arguments& args) {
   size_t numBytes;
   mpfr_rnd_t rMode;
   
-  numBytes = (size_t) getOpArg(1, "Number", args, Number::New(obj->precision_ / 8))->NumberValue();
+  numBytes = (size_t) getOpArg(1, "Number", args, Number::New(0))->NumberValue();
   rMode = (mpfr_rnd_t) getOpArg(2, "Uint32", args, Number::New(obj->rMode_))->Uint32Value();
   base = getOpArg(0, "Uint32", args, Number::New(10))->Uint32Value();
   
@@ -424,8 +433,8 @@ Handle<Value> bigFloat::add(const Arguments& args) {
     return scope.Close(Undefined());
   }
 
-  Handle<Value> arg[1] = { External::New(*res) };		
-  Local<Object> result = constructor->NewInstance(1, arg);
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
 
   return scope.Close(result);
 }
@@ -465,8 +474,8 @@ Handle<Value> bigFloat::sub(const Arguments& args) {
     return scope.Close(Undefined());
   }
 
-  Handle<Value> arg[1] = { External::New(*res) };		
-  Local<Object> result = constructor->NewInstance(1, arg);
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
 
   return scope.Close(result);
 }
@@ -506,8 +515,8 @@ Handle<Value> bigFloat::mul(const Arguments& args) {
     return scope.Close(Undefined());
   }
 
-  Handle<Value> arg[1] = { External::New(*res) };		
-  Local<Object> result = constructor->NewInstance(1, arg);
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
 
   return scope.Close(result);
 }
@@ -546,8 +555,8 @@ Handle<Value> bigFloat::div(const Arguments& args) {
     return scope.Close(Undefined());
   }
 
-  Handle<Value> arg[1] = { External::New(*res) };		
-  Local<Object> result = constructor->NewInstance(1, arg);
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
 
   return scope.Close(result);
 }
@@ -585,8 +594,8 @@ Handle<Value> bigFloat::pow(const Arguments& args) {
     return scope.Close(Undefined());
   }
 
-  Handle<Value> arg[1] = { External::New(*res) };		
-  Local<Object> result = constructor->NewInstance(1, arg);
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
 
   return scope.Close(result);
 }
@@ -626,8 +635,8 @@ Handle<Value> bigFloat::root(const Arguments& args) {
     return scope.Close(Undefined());
   }
 
-  Handle<Value> arg[1] = { External::New(*res) };		
-  Local<Object> result = constructor->NewInstance(1, arg);
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
 
   return scope.Close(result);
 }
@@ -654,8 +663,8 @@ Handle<Value> bigFloat::ln(const Arguments& args) {
   mpfr_init2(*res, precision);
   mpfr_log(*res, *obj->mpFloat_, rMode);
 
-  Handle<Value> arg[1] = { External::New(*res) };		
-  Local<Object> result = constructor->NewInstance(1, arg);
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
 
   return scope.Close(result);
 }
@@ -693,8 +702,8 @@ Handle<Value> bigFloat::log(const Arguments& args) {
     return scope.Close(Undefined());
   }	
 
-  Handle<Value> arg[1] = { External::New(*res) };		
-  Local<Object> result = constructor->NewInstance(1, arg);
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
 
   return scope.Close(result);
 }
@@ -722,8 +731,8 @@ Handle<Value> bigFloat::e(const Arguments& args) {
   mpfr_init2(*res, precision);
   mpfr_exp(*res, *obj->mpFloat_, rMode);
 
-  Handle<Value> arg[1] = { External::New(*res) };		
-  Local<Object> result = constructor->NewInstance(1, arg);
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
 
   return scope.Close(result);
 }
@@ -761,8 +770,8 @@ Handle<Value> bigFloat::exp(const Arguments& args) {
     return scope.Close(Undefined());
   }	
 
-  Handle<Value> arg[1] = { External::New(*res) };		
-  Local<Object> result = constructor->NewInstance(1, arg);
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
 
   return scope.Close(result);
 }
@@ -814,8 +823,8 @@ Handle<Value> bigFloat::cos(const Arguments& args) {
     mpfr_cos(*res, *obj->mpFloat_, rMode);
   }
 
-  Handle<Value> arg[1] = { External::New(*res) };		
-  Local<Object> result = constructor->NewInstance(1, arg);
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
 
   return scope.Close(result);
 }
@@ -868,8 +877,8 @@ Handle<Value> bigFloat::sin(const Arguments& args) {
     mpfr_sin(*res, *obj->mpFloat_, rMode);
   }
 
-  Handle<Value> arg[1] = { External::New(*res) };		
-  Local<Object> result = constructor->NewInstance(1, arg);
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
 
   return scope.Close(result);
 }
@@ -922,8 +931,8 @@ Handle<Value> bigFloat::tan(const Arguments& args) {
     mpfr_tan(*res, *obj->mpFloat_, rMode);
   }
 
-  Handle<Value> arg[1] = { External::New(*res) };		
-  Local<Object> result = constructor->NewInstance(1, arg);
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
 
   return scope.Close(result);
 }
@@ -959,8 +968,8 @@ Handle<Value> bigFloat::atan2(const Arguments& args) {
     return scope.Close(Undefined());
   }
 
-  Handle<Value> arg[1] = { External::New(*res) };		
-  Local<Object> result = constructor->NewInstance(1, arg);
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
 
   return scope.Close(result);
 }
@@ -1004,8 +1013,8 @@ Handle<Value> bigFloat::sec(const Arguments& args) {
     mpfr_sec(*res, *obj->mpFloat_, rMode);
   }
 
-  Handle<Value> arg[1] = { External::New(*res) };		
-  Local<Object> result = constructor->NewInstance(1, arg);
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
 
   return scope.Close(result);
 }
@@ -1050,8 +1059,8 @@ Handle<Value> bigFloat::cosec(const Arguments& args) {
     mpfr_csc(*res, *obj->mpFloat_, rMode);
   }
 
-  Handle<Value> arg[1] = { External::New(*res) };		
-  Local<Object> result = constructor->NewInstance(1, arg);
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
 
   return scope.Close(result);
 }
@@ -1096,8 +1105,8 @@ Handle<Value> bigFloat::cotan(const Arguments& args) {
     mpfr_coth(*res, *obj->mpFloat_, rMode);
   }
 
-  Handle<Value> arg[1] = { External::New(*res) };		
-  Local<Object> result = constructor->NewInstance(1, arg);
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
 
   return scope.Close(result);
 }
@@ -1120,11 +1129,123 @@ Handle<Value> bigFloat::fac(const Arguments& args) {
   unsigned long int factorized = mpfr_get_ui(*obj->mpFloat_, rMode);
   mpfr_fac_ui(*res, factorized, rMode);
 
-  Handle<Value> arg[1] = { External::New(*res) };		
-  Local<Object> result = constructor->NewInstance(1, arg);
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
 
   return scope.Close(result);
 }
+
+
+/* Rounding to integer fuctions
+ */
+
+Handle<Value> bigFloat::toInt(const Arguments& args) {
+  
+  HandleScope scope;
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  mpfr_t * res = new mpfr_t[1];
+  mpfr_prec_t precision = obj->precision_;
+  mpfr_rnd_t rMode = obj->rMode_;
+  Local<String> roundType;
+  
+  if(args[0]->IsString()){
+    String::Utf8Value str(args[0]->ToString());
+    std::string roundType = *str;
+    precision = (mpfr_prec_t) getOpArg(1, "Number", args, Number::New(obj->precision_))->NumberValue();
+    mpfr_init2(*res, precision);
+    
+    if(roundType == "ceil"){
+      mpfr_ceil(*res, *obj->mpFloat_);
+    }
+    if(roundType == "floor"){
+      mpfr_floor(*res, *obj->mpFloat_);
+    }
+    if(roundType == "round"){
+      mpfr_round(*res, *obj->mpFloat_);
+    }
+    if(roundType == "trunc"){
+      mpfr_trunc(*res, *obj->mpFloat_);
+    }
+    else{
+      ThrowException(Exception::TypeError(String::New("Rounding type must be \"ceil\", \"floor\", \"round\" or \"trunc\".")));
+      return scope.Close(Undefined());
+    }	
+  }
+  else{
+    precision = (mpfr_prec_t) getOpArg(0, "Number", args, Number::New(obj->precision_))->NumberValue();
+    rMode = (mpfr_rnd_t) getOpArg(1, "Uint32", args, Uint32::New(rMode))->Uint32Value();
+    mpfr_init2(*res, precision);
+    mpfr_rint(*res, *obj->mpFloat_, rMode);
+  }
+
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
+
+  return scope.Close(result);
+}
+
+
+
+/* Mod/remainder fuctions */
+
+Handle<Value> bigFloat::mod(const Arguments& args) {
+  
+  HandleScope scope;
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  mpfr_t * res = new mpfr_t[1];
+  mpfr_t * op2 = new mpfr_t[1];
+  mpfr_prec_t precision = obj->precision_;
+  mpfr_rnd_t rMode = obj->rMode_;
+  Local<String> modType;
+  
+  precision = (mpfr_prec_t) getOpArg(1, "Number", args, Number::New(obj->precision_))->NumberValue();
+  rMode = (mpfr_rnd_t) getOpArg(2, "Uint32", args, Uint32::New(obj->rMode_))->Uint32Value();
+  mpfr_init2(*res, precision);
+  mpfr_init2(*op2, precision);
+
+  if(args[0]->IsNumber()){
+    mpfr_set_d(*op2, args[0]->NumberValue(), rMode);
+    mpfr_fmod(*res, *obj->mpFloat_, *op2, rMode);
+  }
+  else if(args[0]->IsObject()){
+    bigFloat *op2 = ObjectWrap::Unwrap<bigFloat>(args[0]->ToObject());
+    mpfr_fmod(*res, *obj->mpFloat_, *op2->mpFloat_, rMode);
+  }
+  else if(args[0]->IsString()){
+    String::Utf8Value str(args[0]->ToString());
+    std::string modType = *str;
+  
+    if(args[0]->IsNumber()){
+      mpfr_init2(*op2, precision);
+      mpfr_set_d(*op2, args[0]->NumberValue(), rMode);
+    }
+    else if(args[0]->IsObject()){
+      bigFloat *obj2 = ObjectWrap::Unwrap<bigFloat>(args[0]->ToObject());
+      op2 = obj2->mpFloat_;
+    }
+    
+    if(modType == "remainder"){
+      mpfr_remainder(*res, *obj->mpFloat_, *op2, rMode);
+    }
+    else{
+      ThrowException(Exception::TypeError(String::New("Mod type must be \"remainder\". If blank default is round towards zero")));
+      return scope.Close(Undefined());
+    }	
+  }
+  else{
+    ThrowException(Exception::TypeError(String::New("Argument 1 must a bigReal object, the string \"remainder\" or a number")));
+    return scope.Close(Undefined());
+  }
+
+  mpfr_clear(*op2);
+  delete(op2);
+  
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
+
+  return scope.Close(result);
+}
+
 
 
 /* Arithmetic geometric mean.
@@ -1150,6 +1271,7 @@ Handle<Value> bigFloat::agMean(const Arguments& args) {
     mpfr_t *op2 = new mpfr_t[1];
     mpfr_init2(*op2, precision);
     mpfr_init2(*res, precision);
+    mpfr_set_d(*op2, args[0]->NumberValue(), rMode); 
     mpfr_agm(*res, *obj->mpFloat_, *op2, rMode);
     mpfr_clear(*op2);
     delete(op2);
@@ -1169,8 +1291,8 @@ Handle<Value> bigFloat::agMean(const Arguments& args) {
     return scope.Close(Undefined());
   }
 
-  Handle<Value> arg[1] = { External::New(*res) };		
-  Local<Object> result = constructor->NewInstance(1, arg);
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
 
   return scope.Close(result);
 }
@@ -1199,6 +1321,7 @@ Handle<Value> bigFloat::euNorm(const Arguments& args) {
     mpfr_t * op2 = new mpfr_t[1];
     mpfr_init2(*op2, precision);
     mpfr_init2(*res, precision);
+    mpfr_set_d(*op2, args[0]->NumberValue(), rMode); 
     mpfr_hypot(*res, *obj->mpFloat_, *op2, rMode);
     mpfr_clear(*op2);
     delete(op2);
@@ -1218,12 +1341,57 @@ Handle<Value> bigFloat::euNorm(const Arguments& args) {
     return scope.Close(Undefined());
   }
 
-  Handle<Value> arg[1] = { External::New(*res) };		
-  Local<Object> result = constructor->NewInstance(1, arg);
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
 
   return scope.Close(result);
 }
 
+/* Riemann Zeta function.
+ */
+
+Handle<Value> bigFloat::riemannZ(const Arguments& args) {
+
+  HandleScope scope;
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  mpfr_t * res = new mpfr_t[1];
+  mpfr_prec_t precision;
+  mpfr_rnd_t rMode;
+    
+  precision = (mpfr_prec_t) getOpArg(1, "Number", args, Number::New(obj->precision_))->NumberValue();
+  rMode = (mpfr_rnd_t) getOpArg(2, "Uint32", args, Uint32::New(obj->rMode_))->Uint32Value();
+  mpfr_init2(*res, precision);
+          
+  mpfr_zeta(*res, *obj->mpFloat_, rMode);
+  
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
+
+  return scope.Close(result);
+}
+
+/* Gamma function.
+ */
+
+Handle<Value> bigFloat::gamma(const Arguments& args) {
+
+  HandleScope scope;
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  mpfr_t * res = new mpfr_t[1];
+  mpfr_prec_t precision;
+  mpfr_rnd_t rMode;
+    
+  precision = (mpfr_prec_t) getOpArg(1, "Number", args, Number::New(obj->precision_))->NumberValue();
+  rMode = (mpfr_rnd_t) getOpArg(2, "Uint32", args, Uint32::New(obj->rMode_))->Uint32Value();
+  mpfr_init2(*res, precision);
+          
+  mpfr_gamma(*res, *obj->mpFloat_, rMode);
+  
+  Handle<Value> arg[3] = { External::New(*res), Number::New(precision), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
+
+  return scope.Close(result);
+}
 /* Comparison.
  */
 
@@ -1264,8 +1432,8 @@ Handle<Value> bigFloat::abs(const Arguments& args) {
   mpfr_init2(*res, obj->precision_);	
   mpfr_abs(*res, *obj->mpFloat_, rMode);
 
-  Handle<Value> arg[1] = { External::New(*res) };		
-  Local<Object> result = constructor->NewInstance(1, arg);
+  Handle<Value> arg[3] = { External::New(*res), Number::New(obj->precision_), Uint32::New(rMode) };		
+  Local<Object> result = constructor->NewInstance(3, arg);
 
   return scope.Close(result);
 }
@@ -1278,9 +1446,20 @@ Handle<Value> bigFloat::isRegular(const Arguments& args) {
   
   HandleScope scope;
   bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
-  Local<String> type;
   
   return scope.Close(Boolean::New(mpfr_regular_p(*obj->mpFloat_)));
+}
+
+
+/* Returns if number is an integer. 
+ */
+
+Handle<Value> bigFloat::isInteger(const Arguments& args) {
+  
+  HandleScope scope;
+  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  
+  return scope.Close(Boolean::New(mpfr_integer_p(*obj->mpFloat_)));
 }
 
 /* Returns if number is an ordinary number (neither NaN nor Infinity) 
@@ -1291,7 +1470,6 @@ Handle<Value> bigFloat::isOrdinary(const Arguments& args) {
   
   HandleScope scope;
   bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
-  Local<String> type;
   
   return scope.Close(Boolean::New(mpfr_number_p(*obj->mpFloat_)));
 }
@@ -1304,26 +1482,31 @@ Handle<Value> bigFloat::whatIs(const Arguments& args) {
   
   HandleScope scope;
   bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
-  Local<String> type;
+  Local<String> type = String::New("Ordinary");
   
   int result = mpfr_nan_p(*obj->mpFloat_);
   
   if(result != 0){
-    return scope.Close(String::New("NaN"));
+    type = String::New("NaN");
   }
   
   result = mpfr_inf_p(*obj->mpFloat_);
   
   if(result != 0){		
-    return scope.Close(String::New("Infinity"));
+    type = String::New("Infinity");
   }
   
   result = mpfr_zero_p(*obj->mpFloat_);
   
   if(result != 0){		
-    return scope.Close(String::New("Zero"));
+    type = String::New("Zero");
   }
-  else{		
-    return scope.Close(String::New("Ordinary"));
+  
+  result = mpfr_integer_p(*obj->mpFloat_);
+
+  if(result != 0){
+    type = String::New("Integer");
   }
+
+  return scope.Close(type);
 }

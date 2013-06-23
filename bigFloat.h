@@ -53,11 +53,16 @@ class bigFloat : public node::ObjectWrap {
 		static v8::Handle<v8::Value> cosec(const v8::Arguments& args);
 		static v8::Handle<v8::Value> cotan(const v8::Arguments& args);
 		static v8::Handle<v8::Value> fac(const v8::Arguments& args);
+		static v8::Handle<v8::Value> toInt(const v8::Arguments& args);
+		static v8::Handle<v8::Value> mod(const v8::Arguments& args);
+		static v8::Handle<v8::Value> riemannZ(const v8::Arguments& args);
+		static v8::Handle<v8::Value> gamma(const v8::Arguments& args);
 		static v8::Handle<v8::Value> agMean(const v8::Arguments& args);
 		static v8::Handle<v8::Value> euNorm(const v8::Arguments& args);
 		static v8::Handle<v8::Value> whatIs(const v8::Arguments& args);
 		static v8::Handle<v8::Value> isRegular(const v8::Arguments& args);
 		static v8::Handle<v8::Value> isOrdinary(const v8::Arguments& args);
+		static v8::Handle<v8::Value> isInteger(const v8::Arguments& args);
 		static v8::Handle<v8::Value> getOpArg(int index, std::string type, const v8::Arguments& arg, v8::Handle<v8::Value> defaultValue);
 		mpfr_t *mpFloat_;
 		mpfr_prec_t precision_;
