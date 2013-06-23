@@ -300,12 +300,13 @@ Handle<Value> bigFloat::inspect(const Arguments& args){
   if(position < realValue.length()){
     realValue.insert(position, ".");
   }
-
+  
   Local<String> base = String::Concat(String::New("{ bigFloat: "), String::New(realValue.c_str()));
-  Local<String> precision = String::Concat(String::New(" , precision: "), Number::New((long int) obj->precision_)->ToString());
-  Local<String> type = String::Concat(String::Concat(base, precision), String::New(" }"));
+  Local<String> precision = String::Concat(String::New(" , precision: "), Number::New(obj->precision_)->ToString());
+  Local<String> rMode = String::Concat(String::New(" , rMode: "), Uint32::New(obj->rMode_)->ToString());
+  Local<String> inspection = String::Concat(String::Concat(base, String::Concat(precision, rMode)), String::New(" }"));
 
-  return scope.Close(type);
+  return scope.Close(inspection);
 }
 
 /* Returns a string representing the bigFloat.
