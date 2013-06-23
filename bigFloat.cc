@@ -119,7 +119,7 @@ Handle<Value> config::getPrecision(Local<String> property, const AccessorInfo &i
   Local<Object> self = info.Holder();
   Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
   void* ptr = wrap->Value();
-      unsigned long value = static_cast<config*>(ptr)->precision_;	
+  unsigned long value = static_cast<config*>(ptr)->precision_;	
   return Number::New(value);
 }
   
@@ -128,7 +128,7 @@ void config::setPrecision(Local<String> property, Local<Value> value, const Acce
   Local<Object> self = info.Holder();
   Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
   void* ptr = wrap->Value();
-      static_cast<config*>(ptr)->precision_ = value->NumberValue();
+  static_cast<config*>(ptr)->precision_ = value->NumberValue();
   }
 
 Handle<Value> config::getRmode(Local<String> property, const AccessorInfo &info) {
@@ -136,7 +136,7 @@ Handle<Value> config::getRmode(Local<String> property, const AccessorInfo &info)
   Local<Object> self = info.Holder();
   Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
   void* ptr = wrap->Value();
-  unsigned value = static_cast<config*>(ptr)->rMode_;
+  unsigned int value = static_cast<config*>(ptr)->rMode_;
   return Uint32::New(value);
 }
   
@@ -145,7 +145,7 @@ void config::setRmode(Local<String> property, Local<Value> value, const Accessor
   Local<Object> self = info.Holder();
   Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
   void* ptr = wrap->Value();
-      static_cast<config*>(ptr)->rMode_ = value->Uint32Value();
+  static_cast<config*>(ptr)->rMode_ = value->Uint32Value();
   }
 
 Handle<Value> bigFloat::getOpArg(int index, std::string type, const Arguments& args, Handle<Value> defaultValue){
@@ -489,7 +489,7 @@ Handle<Value> bigFloat::mul(const Arguments& args) {
   HandleScope scope;
   bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
   mpfr_t * res = new mpfr_t[1];
-        mpfr_prec_t precision;
+  mpfr_prec_t precision;
   mpfr_rnd_t rMode;
     
   precision = (mpfr_prec_t) getOpArg(1, "Number", args, Number::New(obj->precision_))->NumberValue();
@@ -529,7 +529,7 @@ Handle<Value> bigFloat::div(const Arguments& args) {
   HandleScope scope;
   bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
   mpfr_t * res = new mpfr_t[1];
-        mpfr_prec_t precision;
+  mpfr_prec_t precision;
   mpfr_rnd_t rMode;
     
   precision = (mpfr_prec_t) getOpArg(1, "Number", args, Number::New(obj->precision_))->NumberValue();
@@ -568,7 +568,7 @@ Handle<Value> bigFloat::pow(const Arguments& args) {
   HandleScope scope;
   bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
   mpfr_t * res = new mpfr_t[1];
-        mpfr_prec_t precision;
+  mpfr_prec_t precision;
   mpfr_rnd_t rMode;
     
   precision = (mpfr_prec_t) getOpArg(1, "Number", args, Number::New(obj->precision_))->NumberValue();
@@ -937,7 +937,7 @@ Handle<Value> bigFloat::atan2(const Arguments& args) {
   HandleScope scope;
   bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
   mpfr_t * res = new mpfr_t[1];
-        mpfr_prec_t precision = obj->precision_;
+  mpfr_prec_t precision = obj->precision_;
   mpfr_rnd_t rMode = obj->rMode_;
     
   precision = (mpfr_prec_t) getOpArg(1, "Number", args, Number::New(obj->precision_))->NumberValue();
@@ -1107,7 +1107,7 @@ Handle<Value> bigFloat::fac(const Arguments& args) {
   HandleScope scope;
   bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
   mpfr_t * res = new mpfr_t[1];
-        mpfr_prec_t precision;
+  mpfr_prec_t precision;
   mpfr_rnd_t rMode;
     
   precision = (mpfr_prec_t) getOpArg(0, "Number", args, Number::New(obj->precision_))->NumberValue();
