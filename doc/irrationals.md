@@ -12,6 +12,7 @@ This chapter discusses the special interface of BigReals to MPFR and how to use 
 *   [Exponentiation, roots and logarithms](#logexp)
 *   [Trigonometry](#trigonometry)
 *   [Integer and remainder functions](#integer)
+*   [Comparison functions](#comparison)
 *   [Number theory](#numbertheory)
 *   [Other functions](#other)
 
@@ -239,6 +240,47 @@ argument. In all the cases, an optional precision and rounding mode could be pro
     console.log(op2.sec("hyp"));
     console.log(op3.tan(100));
     console.log(op2.("invhyp", 100));
+
+---
+
+###<a namef="integer">Integer and remainder functions</a>
+
+To round a bigReals irrational number to an integer, *toInt* function with an optional string specifying the type of rounding to be
+executed could be used. By default, *toInt* will round to the nearest integer in the direction given by a user supplied rounding
+mode. This rounding mode will be the one passed as argument to the function or the one associated with the bigReal number upon
+creation or by calls to *precision* function:
+ 
+    var bigReals = require('bigreals');
+    var op = bigReals("Pi", 100);
+    
+    console.log(op.toInt());
+    console.log(op.toInt(32, 3));
+
+Integers can be rounded to the next or equal integer("ceil"), to the next lower or equal("floor"), to the nearest integer rounding halfway cases
+away from zero("round") or to the next integer towards zero("trunc") by specifying the type of rounding as a string with an optional
+precision argument:
+
+    var bigReals = require('bigreals');
+    var op1 = bigReals("Pi", 100);
+    var op2 = bigreals(23456.535455);
+
+    console.log(op1.toInt("ceil", 32));
+    console.log(op1.toInt("floor", 32));
+    console.log(op2.toInt("round"));
+    console.log(op2.toInt("trunc"));
+
+To calculate the remainder of the division of a bigReal number by a quotient, you could use the *mod* function. By default, *mod*
+will calculate the remainder of the division by the number or bigReal number passed as argument rounding towards zero with an optional precision.
+If you want to round to the nearest integer, pass the string "remainder" and optionally a precision as argument:
+
+    var bigReals = require('bigreals');
+    var op1 = bigReals("Pi", 100);
+    var op2 = bigreals(20);
+
+    console.log(op2.mod(3, 32));
+    console.log(op2.mod(op1));
+    console.log(op2.mod("remainder", 3, 32));
+    console.log(op2.mod("remainder", op1));
 
 ---
 
