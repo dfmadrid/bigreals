@@ -1,8 +1,8 @@
 {
   "targets": [
     {
-      "target_name": "bigInteger",
-      "sources": [ "bigInteger.cc", "bigInt.cc" ],
+      "target_name": "bigIntegers",
+      "sources": [ "intFactory.cc", "bigInt.cc" ],
       'conditions': [
         ['OS=="linux"',
           {
@@ -34,8 +34,8 @@
       ]
     },
     {
-      "target_name": "bigIrrational",
-      "sources": [ "bigIrrational.cc", "bigFloat.cc" ],
+      "target_name": "bigReals",
+      "sources": [ "realsFactory.cc", "bigReal.cc" ],
       'conditions': [
         ['OS=="linux"',
           {

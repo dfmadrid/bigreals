@@ -8,6 +8,8 @@
 #include <gmp.h>
 #include <mpfr.h>
 
+// Defaults config class
+
 class config {
 	public:	
 		config(long int precision, int rMode) : precision_(precision), rMode_(rMode) { }
@@ -20,13 +22,15 @@ class config {
 		static void setRmode(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::AccessorInfo& info);
 };
 
-class bigFloat : public node::ObjectWrap {
+// bigReals irrational number class
+
+class bigReal : public node::ObjectWrap {
 	public:
 		static void Init();
 		static v8::Handle<v8::Value> NewInstance(const v8::Arguments& args);
 	private:
-		bigFloat();
-		~bigFloat();
+		bigReal();
+		~bigReal();
 		static v8::Persistent<v8::Function> constructor;
 		static v8::Handle<v8::Value> New(const v8::Arguments& args);
 		static v8::Handle<v8::Value> inspect(const v8::Arguments& args);

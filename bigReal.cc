@@ -10,25 +10,25 @@
 #include <string>
 #include <gmp.h>
 #include <mpfr.h>
-#include "bigFloat.h"
+#include "bigReal.h"
 
 
 using namespace v8;
 
-bigFloat::bigFloat() {};
-bigFloat::~bigFloat(){
+bigReal::bigReal() {};
+bigReal::~bigReal(){
   mpfr_clear(*mpFloat_);
   delete(mpFloat_);
 };
 
-Persistent<Function> bigFloat::constructor;
+Persistent<Function> bigReal::constructor;
 
-void bigFloat::Init() {
+void bigReal::Init() {
 
   // Constructor template
   
   Local<FunctionTemplate> tpl = FunctionTemplate::New(New);
-  tpl->SetClassName(String::NewSymbol("bigFloat"));
+  tpl->SetClassName(String::NewSymbol("bigReal"));
   
   // Defaults Javascript object
   
@@ -177,7 +177,7 @@ void config::setRmode(Local<String> property, Local<Value> value, const Accessor
  * If no argument exists in the specified position of Arguments& array, return defaultValue
  */
 
-Handle<Value> bigFloat::getOpArg(int index, std::string type, const Arguments& args, Handle<Value> defaultValue){
+Handle<Value> bigReal::getOpArg(int index, std::string type, const Arguments& args, Handle<Value> defaultValue){
 
   HandleScope scope;
   Local<String> strStart = String::Concat(String::New(type.c_str()), String::New(" must be "));
@@ -245,10 +245,10 @@ Handle<Value> bigFloat::getOpArg(int index, std::string type, const Arguments& a
  * Internally is called with a pointer to a mpfr struct as argument to return the result of operations
  */
 
-Handle<Value> bigFloat::New(const Arguments& args){
+Handle<Value> bigReal::New(const Arguments& args){
 
   HandleScope scope;
-  bigFloat *obj = new bigFloat();
+  bigReal *obj = new bigReal();
 
   // Get the defaults object precision and rMode properties.
 
@@ -316,7 +316,7 @@ Handle<Value> bigFloat::New(const Arguments& args){
 
 // Simulates the behaviour a Javascript's new operator
 
-Handle<Value> bigFloat::NewInstance(const Arguments& args) {
+Handle<Value> bigReal::NewInstance(const Arguments& args) {
   
   HandleScope scope;
   int argc = args.Length();
@@ -337,10 +337,10 @@ Handle<Value> bigFloat::NewInstance(const Arguments& args) {
  * the same bigReal number rounding to the nearest.
  */
 
-Handle<Value> bigFloat::inspect(const Arguments& args){
+Handle<Value> bigReal::inspect(const Arguments& args){
 
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());	
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());	
   mpfr_exp_t *exponent = new mpfr_exp_t[1];
   Local<String> base, precision, rMode, inspection;
 
@@ -354,7 +354,7 @@ Handle<Value> bigFloat::inspect(const Arguments& args){
     realValue.insert(position, ".");
   }
   
-  base = String::Concat(String::New("{ bigFloat: "), String::New(realValue.c_str()));
+  base = String::Concat(String::New("{ bigReal: "), String::New(realValue.c_str()));
   precision = String::Concat(String::New(" , precision: "), Number::New(obj->precision_)->ToString());
   rMode = String::Concat(String::New(" , rMode: "), Uint32::New(obj->rMode_)->ToString());
   inspection = String::Concat(String::Concat(base, String::Concat(precision, rMode)), String::New(" }"));
@@ -369,10 +369,10 @@ Handle<Value> bigFloat::inspect(const Arguments& args){
  * number rounding to the nearest.
  */
 
-Handle<Value> bigFloat::toString(const Arguments& args) {
+Handle<Value> bigReal::toString(const Arguments& args) {
 
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   int base;
   size_t numBytes;
   mpfr_rnd_t rMode;
@@ -401,10 +401,10 @@ Handle<Value> bigFloat::toString(const Arguments& args) {
  * If no arguments are provided, returns the current precision of the bigReal.
  */
 
-Handle<Value> bigFloat::precision(const Arguments& args) {
+Handle<Value> bigReal::precision(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_prec_t precision = 0;
   
   if(args[0]->IsUndefined()){
@@ -424,10 +424,10 @@ Handle<Value> bigFloat::precision(const Arguments& args) {
  * If no arguments are provided, returns the current rounding mode of the bigReal.
  */
 
-Handle<Value> bigFloat::rMode(const Arguments& args) {
+Handle<Value> bigReal::rMode(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_rnd_t rMode;
   
   if(args[0]->IsUndefined()){
@@ -450,10 +450,10 @@ Handle<Value> bigFloat::rMode(const Arguments& args) {
  */
 
 
-Handle<Value> bigFloat::add(const Arguments& args) {
+Handle<Value> bigReal::add(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_prec_t precision;
   mpfr_rnd_t rMode;
@@ -466,7 +466,7 @@ Handle<Value> bigFloat::add(const Arguments& args) {
     mpfr_add_d(*res, *obj->mpFloat_, args[0]->NumberValue(), rMode);
   }
   else if(args[0]->IsObject()){
-    bigFloat* obj2 = ObjectWrap::Unwrap<bigFloat>(args[0]->ToObject());
+    bigReal* obj2 = ObjectWrap::Unwrap<bigReal>(args[0]->ToObject());
     if(obj2->precision_ > precision){
       mpfr_init2(*res, obj2->precision_);
     }
@@ -476,7 +476,7 @@ Handle<Value> bigFloat::add(const Arguments& args) {
     mpfr_add(*res, *obj->mpFloat_, *obj2->mpFloat_, rMode);
   }
   else{
-    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigfloat or number")));
+    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigReal or a number")));
     return scope.Close(Undefined());
   }
 
@@ -492,10 +492,10 @@ Handle<Value> bigFloat::add(const Arguments& args) {
  * If no precision is provided, chooses the highest precision between the ones of the two operands.
  */
 
-Handle<Value> bigFloat::sub(const Arguments& args) {
+Handle<Value> bigReal::sub(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_prec_t precision;
   mpfr_rnd_t rMode;
@@ -508,7 +508,7 @@ Handle<Value> bigFloat::sub(const Arguments& args) {
     mpfr_sub_d(*res, *obj->mpFloat_, args[0]->NumberValue(), rMode);
   }
   else if(args[0]->IsObject()){
-    bigFloat* obj2 = ObjectWrap::Unwrap<bigFloat>(args[0]->ToObject());
+    bigReal* obj2 = ObjectWrap::Unwrap<bigReal>(args[0]->ToObject());
     if(obj2->precision_ > precision){
       mpfr_init2(*res, obj2->precision_);
     }
@@ -518,7 +518,7 @@ Handle<Value> bigFloat::sub(const Arguments& args) {
     mpfr_sub(*res, *obj->mpFloat_, *obj2->mpFloat_, rMode);
   }
   else{
-    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigfloat, a double or a long integer")));
+    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigReal or a number")));
     return scope.Close(Undefined());
   }
 
@@ -534,10 +534,10 @@ Handle<Value> bigFloat::sub(const Arguments& args) {
  * If no precision is provided, chooses the highest precision between the ones of the two operands.
  */
 
-Handle<Value> bigFloat::mul(const Arguments& args) {
+Handle<Value> bigReal::mul(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_prec_t precision;
   mpfr_rnd_t rMode;
@@ -550,7 +550,7 @@ Handle<Value> bigFloat::mul(const Arguments& args) {
     mpfr_mul_d(*res, *obj->mpFloat_, args[0]->NumberValue(), rMode);
   }
   else if(args[0]->IsObject()){
-    bigFloat* obj2 = ObjectWrap::Unwrap<bigFloat>(args[0]->ToObject());
+    bigReal* obj2 = ObjectWrap::Unwrap<bigReal>(args[0]->ToObject());
     if(obj2->precision_ > precision){
       mpfr_init2(*res, obj2->precision_);
     }
@@ -560,7 +560,7 @@ Handle<Value> bigFloat::mul(const Arguments& args) {
     mpfr_mul(*res, *obj->mpFloat_, *obj2->mpFloat_, rMode);
   }
   else{
-    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigfloat or number")));
+    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigReal or a number")));
     return scope.Close(Undefined());
   }
 
@@ -576,10 +576,10 @@ Handle<Value> bigFloat::mul(const Arguments& args) {
  * If no precision is provided, chooses the highest precision between the ones of the two operands.
  */
 
-Handle<Value> bigFloat::div(const Arguments& args) {
+Handle<Value> bigReal::div(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_prec_t precision;
   mpfr_rnd_t rMode;
@@ -592,7 +592,7 @@ Handle<Value> bigFloat::div(const Arguments& args) {
     mpfr_div_d(*res, *obj->mpFloat_, args[0]->NumberValue(), rMode);
   }
   else if(args[0]->IsObject()){
-    bigFloat* obj2 = ObjectWrap::Unwrap<bigFloat>(args[0]->ToObject());
+    bigReal* obj2 = ObjectWrap::Unwrap<bigReal>(args[0]->ToObject());
     if(obj2->precision_ > precision){
       mpfr_init2(*res, obj2->precision_);
     }
@@ -602,7 +602,7 @@ Handle<Value> bigFloat::div(const Arguments& args) {
     mpfr_div(*res, *obj->mpFloat_, *obj2->mpFloat_, rMode);
   }
   else{
-    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigfloat or number")));
+    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigReal or a number")));
     return scope.Close(Undefined());
   }
 
@@ -618,10 +618,10 @@ Handle<Value> bigFloat::div(const Arguments& args) {
  * If no precision is provided, chooses the highest precision between the ones of the two operands.
  */
 
-Handle<Value> bigFloat::pow(const Arguments& args) {
+Handle<Value> bigReal::pow(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_prec_t precision;
   mpfr_rnd_t rMode;
@@ -634,7 +634,7 @@ Handle<Value> bigFloat::pow(const Arguments& args) {
     mpfr_pow_si(*res, *obj->mpFloat_, args[0]->NumberValue(), rMode);
   }
   else if(args[0]->IsObject()){
-    bigFloat* obj2 = ObjectWrap::Unwrap<bigFloat>(args[0]->ToObject());
+    bigReal* obj2 = ObjectWrap::Unwrap<bigReal>(args[0]->ToObject());
     if(obj2->precision_ > precision){
       mpfr_init2(*res, obj2->precision_);
     }
@@ -644,7 +644,7 @@ Handle<Value> bigFloat::pow(const Arguments& args) {
     mpfr_pow(*res, *obj->mpFloat_, *obj2->mpFloat_, rMode);
   }
   else{
-    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigfloat or long integer")));
+    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigReal or a number")));
     return scope.Close(Undefined());
   }
 
@@ -660,10 +660,10 @@ Handle<Value> bigFloat::pow(const Arguments& args) {
  * If no precision is provided, chooses the highest precision between the ones of the two operands.
  */
 
-Handle<Value> bigFloat::root(const Arguments& args) {
+Handle<Value> bigReal::root(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_prec_t precision;
   mpfr_rnd_t rMode;
@@ -676,7 +676,7 @@ Handle<Value> bigFloat::root(const Arguments& args) {
     mpfr_root(*res, *obj->mpFloat_, args[0]->NumberValue(), rMode);
   }
   else if(args[0]->IsObject()){
-    bigFloat* obj2 = ObjectWrap::Unwrap<bigFloat>(args[0]->ToObject());
+    bigReal* obj2 = ObjectWrap::Unwrap<bigReal>(args[0]->ToObject());
     if(obj2->precision_ > precision){
       mpfr_init2(*res, obj2->precision_);
     }
@@ -687,7 +687,7 @@ Handle<Value> bigFloat::root(const Arguments& args) {
     mpfr_root(*res, *obj->mpFloat_, exponent, rMode);
   }
   else{
-    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigfloat or long integer")));
+    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigReal or a number")));
     return scope.Close(Undefined());
   }
 
@@ -702,10 +702,10 @@ Handle<Value> bigFloat::root(const Arguments& args) {
  */
 
 
-Handle<Value> bigFloat::ln(const Arguments& args) {
+Handle<Value> bigReal::ln(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_prec_t precision;
   mpfr_rnd_t rMode;
@@ -728,10 +728,10 @@ Handle<Value> bigFloat::ln(const Arguments& args) {
  */
 
 
-Handle<Value> bigFloat::log(const Arguments& args) {
+Handle<Value> bigReal::log(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_prec_t precision;
   mpfr_rnd_t rMode;
@@ -766,10 +766,10 @@ Handle<Value> bigFloat::log(const Arguments& args) {
  */
 
 
-Handle<Value> bigFloat::e(const Arguments& args) {
+Handle<Value> bigReal::e(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_prec_t precision;
   mpfr_rnd_t rMode;
@@ -792,10 +792,10 @@ Handle<Value> bigFloat::e(const Arguments& args) {
  */
 
 
-Handle<Value> bigFloat::exp(const Arguments& args) {
+Handle<Value> bigReal::exp(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_prec_t precision;
   mpfr_rnd_t rMode;
@@ -830,10 +830,10 @@ Handle<Value> bigFloat::exp(const Arguments& args) {
  * Optionally a precision and rounding mode of the result could be provided.
  */
 
-Handle<Value> bigFloat::cos(const Arguments& args) {
+Handle<Value> bigReal::cos(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_prec_t precision = obj->precision_;
   mpfr_rnd_t rMode = obj->rMode_;
@@ -884,10 +884,10 @@ Handle<Value> bigFloat::cos(const Arguments& args) {
  * Optionally a precision and rounding mode of the result could be provided.
  */
 
-Handle<Value> bigFloat::sin(const Arguments& args) {
+Handle<Value> bigReal::sin(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_prec_t precision = obj->precision_;
   mpfr_rnd_t rMode = obj->rMode_;
@@ -938,10 +938,10 @@ Handle<Value> bigFloat::sin(const Arguments& args) {
  * Optionally a precision and rounding mode of the result could be provided.
  */
 
-Handle<Value> bigFloat::tan(const Arguments& args) {
+Handle<Value> bigReal::tan(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_prec_t precision = obj->precision_;
   mpfr_rnd_t rMode = obj->rMode_;
@@ -993,10 +993,10 @@ Handle<Value> bigFloat::tan(const Arguments& args) {
  * Optionally a precision and rounding mode could be provided.
  */
 
-Handle<Value> bigFloat::atan2(const Arguments& args) {
+Handle<Value> bigReal::atan2(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_prec_t precision = obj->precision_;
   mpfr_rnd_t rMode = obj->rMode_;
@@ -1005,7 +1005,7 @@ Handle<Value> bigFloat::atan2(const Arguments& args) {
   rMode = (mpfr_rnd_t) getOpArg(2, "Rounding Mode", args, Uint32::New(obj->rMode_))->Uint32Value();
 
   if(args[0]->IsObject()){
-    bigFloat* obj2 = ObjectWrap::Unwrap<bigFloat>(args[0]->ToObject());
+    bigReal* obj2 = ObjectWrap::Unwrap<bigReal>(args[0]->ToObject());
     if(obj2->precision_ > precision){
       mpfr_init2(*res, obj2->precision_);
     }
@@ -1015,7 +1015,7 @@ Handle<Value> bigFloat::atan2(const Arguments& args) {
     mpfr_atan2(*res, *obj->mpFloat_, *obj2->mpFloat_, rMode);
   }
   else{
-    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigfloat")));
+    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigReal")));
     return scope.Close(Undefined());
   }
 
@@ -1031,10 +1031,10 @@ Handle<Value> bigFloat::atan2(const Arguments& args) {
  * Optionally a precision and rounding mode of the result could be provided.
  */
 
-Handle<Value> bigFloat::sec(const Arguments& args) {
+Handle<Value> bigReal::sec(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_prec_t precision = obj->precision_;
   mpfr_rnd_t rMode = obj->rMode_;
@@ -1079,10 +1079,10 @@ Handle<Value> bigFloat::sec(const Arguments& args) {
  * Optionally a precision and rounding mode of the result could be provided.
  */
 
-Handle<Value> bigFloat::cosec(const Arguments& args) {
+Handle<Value> bigReal::cosec(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_prec_t precision = obj->precision_;
   mpfr_rnd_t rMode = obj->rMode_;
@@ -1127,10 +1127,10 @@ Handle<Value> bigFloat::cosec(const Arguments& args) {
  * Optionally a precision and rounding mode of the result could be provided.
  */
 
-Handle<Value> bigFloat::cotan(const Arguments& args) {
+Handle<Value> bigReal::cotan(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_prec_t precision = obj->precision_;
   mpfr_rnd_t rMode = obj->rMode_;
@@ -1173,10 +1173,10 @@ Handle<Value> bigFloat::cotan(const Arguments& args) {
  * Optionally a precision and rounding mode of the result could be provided.
  */
 
-Handle<Value> bigFloat::fac(const Arguments& args) {
+Handle<Value> bigReal::fac(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_prec_t precision;
   mpfr_rnd_t rMode;
@@ -1203,10 +1203,10 @@ Handle<Value> bigFloat::fac(const Arguments& args) {
  * the nearest with halfaway cases rounded away from zero) and trunc(rounding to the next toward zero).
  */
 
-Handle<Value> bigFloat::toInt(const Arguments& args) {
+Handle<Value> bigReal::toInt(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_prec_t precision = obj->precision_;
   mpfr_rnd_t rMode = obj->rMode_;
@@ -1250,12 +1250,18 @@ Handle<Value> bigFloat::toInt(const Arguments& args) {
 
 
 
-/* Mod/remainder fuctions */
+/* Mod/remainder fuctions of the division of a bigReal number by a user supplied divisor.
+ * Divisor might be an integer, a double or another bigReal number. In case an integer is supplied, it
+ * will explicitly casted to a double.
+ * By default will round result toward zero unless the string "remainder" is passed as argument,
+ * which will round result to the nearest.
+ * Optionally a precision and rounding mode of the result could be passed as arguments.
+ */
 
-Handle<Value> bigFloat::mod(const Arguments& args) {
+Handle<Value> bigReal::mod(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_t * op2 = new mpfr_t[1];
   mpfr_prec_t precision = obj->precision_;
@@ -1272,7 +1278,10 @@ Handle<Value> bigFloat::mod(const Arguments& args) {
     mpfr_fmod(*res, *obj->mpFloat_, *op2, rMode);
   }
   else if(args[0]->IsObject()){
-    bigFloat *op2 = ObjectWrap::Unwrap<bigFloat>(args[0]->ToObject());
+
+    // TODO: choose the highest precision of the operands if there is no user supplied precision
+
+    bigReal *op2 = ObjectWrap::Unwrap<bigReal>(args[0]->ToObject());
     mpfr_fmod(*res, *obj->mpFloat_, *op2->mpFloat_, rMode);
   }
   else if(args[0]->IsString()){
@@ -1284,7 +1293,7 @@ Handle<Value> bigFloat::mod(const Arguments& args) {
       mpfr_set_d(*op2, args[0]->NumberValue(), rMode);
     }
     else if(args[0]->IsObject()){
-      bigFloat *obj2 = ObjectWrap::Unwrap<bigFloat>(args[0]->ToObject());
+      bigReal *obj2 = ObjectWrap::Unwrap<bigReal>(args[0]->ToObject());
       op2 = obj2->mpFloat_;
     }
     
@@ -1312,18 +1321,17 @@ Handle<Value> bigFloat::mod(const Arguments& args) {
 
 
 
-/* Arithmetic geometric mean.
- * Accepts as arguments a double or a uint64 signed integer and
- * optionally a precision and rounding mode of the operation.
- * If no precision is provided, chooses the highest precision
- * of the 2 operands.
+/* Arithmetic geometric mean of a bigReal number and an integer, double or another bigReal number.
+ * If an integer is supplied as argument, it will be casted explicitly to a double.
+ * Optionally a precision and a rounding mode of the result could be passed as arguments.
+ * If no precision is provided, chooses the highest precision between the ones of the two operands.
  */
 
 
-Handle<Value> bigFloat::agMean(const Arguments& args) {
+Handle<Value> bigReal::agMean(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t *res = new mpfr_t[1];
   mpfr_prec_t precision;
   mpfr_rnd_t rMode;
@@ -1341,7 +1349,7 @@ Handle<Value> bigFloat::agMean(const Arguments& args) {
     delete(op2);
   }
   else if(args[0]->IsObject()){
-    bigFloat* obj2 = ObjectWrap::Unwrap<bigFloat>(args[0]->ToObject());
+    bigReal* obj2 = ObjectWrap::Unwrap<bigReal>(args[0]->ToObject());
     if(obj2->precision_ > precision){
       mpfr_init2(*res, obj2->precision_);
     }
@@ -1351,7 +1359,7 @@ Handle<Value> bigFloat::agMean(const Arguments& args) {
     mpfr_agm(*res, *obj->mpFloat_, *obj2->mpFloat_, rMode);
   }
   else{
-    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigfloat or number")));
+    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigReal or number")));
     return scope.Close(Undefined());
   }
 
@@ -1362,18 +1370,17 @@ Handle<Value> bigFloat::agMean(const Arguments& args) {
 }
 
 
-/* Euclidean norm. 
- * Accepts as arguments a double or a uint64 signed integer and
- * optionally a precision and rounding mode of the operation.
- * If no precision is provided, chooses the highest precision
- * of the 2 operands.
+/* Euclidean norm of a bigReal number and an integer, a double or another bigReal number.
+ * If an integer is supplied, it will casted explicitly to a double.
+ * Optionally a precision and rounding mode of the result can be passed as arguments.
+ * If no precision is provided, chooses the highest precision between the ones of two operands.
  */
 
 
-Handle<Value> bigFloat::euNorm(const Arguments& args) {
+Handle<Value> bigReal::euNorm(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_prec_t precision;
   mpfr_rnd_t rMode;
@@ -1391,7 +1398,7 @@ Handle<Value> bigFloat::euNorm(const Arguments& args) {
     delete(op2);
   }
   else if(args[0]->IsObject()){
-    bigFloat* obj2 = ObjectWrap::Unwrap<bigFloat>(args[0]->ToObject());
+    bigReal* obj2 = ObjectWrap::Unwrap<bigReal>(args[0]->ToObject());
     if(obj2->precision_ > precision){
       mpfr_init2(*res, obj2->precision_);
     }
@@ -1401,7 +1408,7 @@ Handle<Value> bigFloat::euNorm(const Arguments& args) {
     mpfr_hypot(*res, *obj->mpFloat_, *obj2->mpFloat_, rMode);
   }
   else{
-    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigfloat or number")));
+    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigReal or number")));
     return scope.Close(Undefined());
   }
 
@@ -1411,13 +1418,14 @@ Handle<Value> bigFloat::euNorm(const Arguments& args) {
   return scope.Close(result);
 }
 
-/* Riemann Zeta function.
+/* Riemann Zeta function of a bigReal number.
+ * Optionally accepts as arguments a precision and rounding mode of the result of the calculation.
  */
 
-Handle<Value> bigFloat::riemannZ(const Arguments& args) {
+Handle<Value> bigReal::riemannZ(const Arguments& args) {
 
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_prec_t precision;
   mpfr_rnd_t rMode;
@@ -1434,13 +1442,14 @@ Handle<Value> bigFloat::riemannZ(const Arguments& args) {
   return scope.Close(result);
 }
 
-/* Gamma function.
+/* Gamma function of a bigReal number.
+ * Optionally accepts as arguments a precision and rounding mode of the result of the calculation.
  */
 
-Handle<Value> bigFloat::gamma(const Arguments& args) {
+Handle<Value> bigReal::gamma(const Arguments& args) {
 
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t * res = new mpfr_t[1];
   mpfr_prec_t precision;
   mpfr_rnd_t rMode;
@@ -1456,38 +1465,40 @@ Handle<Value> bigFloat::gamma(const Arguments& args) {
 
   return scope.Close(result);
 }
-/* Comparison.
+
+/* Comparison between a bigReal number and an integer, a double or another bigReal number.
+ * In case an integer is passed as argument, it will be casted explicitly to a double.
  */
 
-Handle<Value> bigFloat::cmp(const Arguments& args) {
+Handle<Value> bigReal::cmp(const Arguments& args) {
 
   HandleScope scope;
   int result = 0;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
         
   if(args[0]->IsNumber()){
     result = mpfr_cmp_d(*obj->mpFloat_, args[0]->NumberValue());
   }
   else if(args[0]->IsObject()){
-    bigFloat* obj2 = ObjectWrap::Unwrap<bigFloat>(args[0]->ToObject());
+    bigReal* obj2 = ObjectWrap::Unwrap<bigReal>(args[0]->ToObject());
     result = mpfr_cmp(*obj->mpFloat_, *obj2->mpFloat_);
   }
   else{
-    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigfloat or number")));
+    ThrowException(Exception::TypeError(String::New("Argument 1 must be a bigReal or number")));
     return scope.Close(Undefined());
   }
 
   return scope.Close(Integer::New(result));
 }
 
-/* Absolute value.
- * Accepts as optional argument a unsigned integer as rounding mode.
+/* Absolute value of a bigReal number.
+ * Accepts as optional argument a rounding Mode of the result.
  */
 
-Handle<Value> bigFloat::abs(const Arguments& args) {
+Handle<Value> bigReal::abs(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   mpfr_t *res = new mpfr_t[1];
   mpfr_rnd_t rMode;
     
@@ -1502,12 +1513,14 @@ Handle<Value> bigFloat::abs(const Arguments& args) {
   return scope.Close(result);
 }
 
-/* Returns if object is NaN, Infinity, Zero, an integer an ordinary number or an ordinary number.*/
+/* Returns if object is NaN, Infinity, Zero, an integer an regular number or an ordinary number comparing
+ * with the type passed as argument
+ */
 
-Handle<Value> bigFloat::is(const Arguments& args) {
+Handle<Value> bigReal::is(const Arguments& args) {
   
   HandleScope scope;
-  bigFloat *obj = ObjectWrap::Unwrap<bigFloat>(args.This());
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
   Handle<Boolean> result = Boolean::New(false);
 
   if(args[0]->IsString()){

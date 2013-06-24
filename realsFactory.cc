@@ -2,24 +2,24 @@
 #define BUILDING_NODE_EXTENSION
 #endif
 #include <node.h>
-#include "bigFloat.h"
+#include "bigReal.h"
 
 using namespace v8;
 
-Handle<Value> bigIrrational(const Arguments& args) {
+Handle<Value> factory(const Arguments& args) {
 
   HandleScope scope;
 
-  return scope.Close(bigFloat::NewInstance(args));
+  return scope.Close(bigReal::NewInstance(args));
 }
 
 void InitAll(Handle<Object> exports, Handle<Object> module) {
   
-  bigFloat::Init();
+  bigReal::Init();
 
   module->Set(String::NewSymbol("exports"),
-    FunctionTemplate::New(bigIrrational)->GetFunction());
+    FunctionTemplate::New(factory)->GetFunction());
  
 }
 
-NODE_MODULE(bigIrrational, InitAll)
+NODE_MODULE(realsFactory, InitAll)
