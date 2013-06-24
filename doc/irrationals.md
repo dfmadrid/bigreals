@@ -16,9 +16,9 @@ This chapter discusses the special interface of BigReals to MPFR and how to use 
 *   [Number theory](#numbertheory)
 *   [Other functions](#other)
 
----
-####Next: [Rounding modes](#rounding)   Previous: [contents](#top)   Up: [BigReals Manual](manual.md)
----
+***
+Next: [Rounding modes](#rounding)   Previous: [contents](#top)   Up: [BigReals Manual](manual.md)
+***
 
 ###<a name="precision">Precision</a>
 
