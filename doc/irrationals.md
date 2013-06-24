@@ -147,17 +147,19 @@ base is a mandatory argument:
     console.log(op2);
     console.log(op3);
 
-Irrationals are composed of decimal numbers plus special numbers like Pi, Euler and Catalan constants, so bigReals
+Irrationals are composed of decimal numbers plus special numbers like log2*, *Pi*, *Euler*'s and *Catalan*'s constants, so bigReals
 supports initialization to any of those constants with an optional precision and rounding mode:
 
     var bigReals = require('bigreals');
     var pi = bigReals("Pi", 100);
     var cat = bigReals("Catalan");
-    var euler = bigREals("Euler");
+    var euler = bigReals("Euler");
+    var log2 = bigReals("log2);
     
     console.log(pi);
     console.log(cat);
     console.log(euler);
+    console.log(log2);
     
 ***
 Next: [Essential arithmetics](#arithmetics)&nbsp;&nbsp;&nbsp;Previous: [Exponentiation, roots and logarithms](#logexp)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
@@ -331,8 +333,8 @@ both numbers are equal, 1 if the bigReals number is bigger than the operand or -
     console.log(op2.cmp(op3));
     console.log(op3.cmp(-0.45877));
 
-To check if a bigReal number is not a number("*NaN*"), infinity("*Infinity*"), zero("*Zero*") a regular number("*Regular*") and integer
-("*Integer*") or an ordinary number("*Ordinary*"), you can use the **is** function supplying as argument the type to compare with:
+To check if a bigReal number is not a number("NaN"), infinity("Infinity"), zero("Zero") a regular number("Regular") and integer
+("Integer") or an ordinary number("Ordinary"), you can use the **is** function supplying as argument the type to compare with:
 
     var bigReals = require('bigreals');
     var op1 = bigReals();
