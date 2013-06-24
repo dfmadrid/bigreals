@@ -11,6 +11,7 @@ This chapter discusses the special interface of BigReals to MPFR and how to use 
 *   [Basic arithmetics](#arithmetics)
 *   [Exponentiation, roots and logarithms](#logexp)
 *   [Trigonometry](#trigonometry)
+*   [Integer and remainder functions](#integer)
 *   [Number theory](#numbertheory)
 *   [Other functions](#other)
 
@@ -255,12 +256,12 @@ an optional precision and rounding mode could be provided and in the case of *ab
     var op2 = bigReals(12.57);
     var op3 = bigReals(-23456.45678);
     
-    console.log(op1.fac);
+    console.log(op1.fac());
     console.log(op2.fac(100));
     console.log(op3.abs());
 
 To compare a bigReals number with a normal number or another bigReals number, you could use the function *cmp*, which will return 0 if
-both numbers are equal, 1 if the bigReals number is bigger than the operando or -1 otherwise:
+both numbers are equal, 1 if the bigReals number is bigger than the operand or -1 otherwise:
 
     var bigReals = require('bigreals');
     var op1 = bigReals(12.57);
