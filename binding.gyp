@@ -2,7 +2,7 @@
   "targets": [
     {
       "target_name": "bigIntegers",
-      "sources": [ "intFactory.cc", "bigInt.cc" ],
+      "sources": [ "src/bigIntegers/intFactory.cc", "src/bigIntegers/bigInt.cc" ],
       'conditions': [
         ['OS=="linux"',
           {
@@ -35,7 +35,7 @@
     },
     {
       "target_name": "bigReals",
-      "sources": [ "realsFactory.cc", "bigReal.cc" ],
+      "sources": [ "src/bigReals/realsFactory.cc", "src/bigReals/bigReal.cc" ],
       'conditions': [
         ['OS=="linux"',
           {
