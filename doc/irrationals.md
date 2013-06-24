@@ -17,7 +17,7 @@ This chapter discusses the special interface of BigReals to MPFR and how to use 
 *   [Other functions](#other)
 
 ***
-Next: [Rounding modes](#rounding)   Previous: [contents](#top)   Up: [BigReals Manual](manual.md)
+Next: [Rounding modes](#rounding)   Previous: [Contents](#top)   Up: [BigReals Manual](manual.md)
 ***
 
 ###<a name="precision">Precision</a>
@@ -74,7 +74,9 @@ You can get or set the precision of a bigReal number by using the *precision()* 
     op.precision(5000);
     console.log("New precision of op is = " + op.precision());
 
----
+***
+Next: [Initialization](#initialization)   Previous: [Precision](#precision)   Top: [Contents](#contents)
+***
 
 ###<a name="rounding">Rounding Modes</a>
 
@@ -114,7 +116,9 @@ You can get or set the rounding mode of a bigReals irrational number by using th
     op.rMode(3);
     console.log("New rounding mode of op is = " + op.rMode());
 
----
+***
+Next: [Essential arithmetics](#arithmetics)   Previous: [Rounding modes](#rounding)   Top: [Contents](#contents)
+***
 
 ###<a name="initialization">Initialization</a>
 
@@ -162,9 +166,11 @@ supports initialization to any of those constants with an optional precision and
     console.log(cat);
     console.log(euler);
     
----
+***
+Next: [Exponentiation, roots and logarithms](#logexp)   Previous: [Essential arithmetics](#arithmetics)   Top: [Contents](#contents)
+***
 
-###<a name="arithmetics">Basic Arithmetics</a>
+###<a name="arithmetics">Essential Arithmetics</a>
 
 BigReals supports basic arithmetic calculations like addition(function *add*), substracction(function *sub*), multiplication(function *mul*), and division(function *div*).
 All the functions follow the same pattern in relation to arguments allowed, they accept either a double, a long int or another 
@@ -180,7 +186,9 @@ bigReal object with an optional precision and rounding mode of the calculation. 
     console.log(op2.mul(10));
     console.log(op3.div(op2).sub(2.57));
     
----
+***
+Next: [Trigonometry](#trigonometry)   Previous: [Exponentiation, roots and logarithms](#logexp)   Top: [Contents](#contents)
+***
 
 ###<a name="logexp">Exponentation, roots and logarithms</a>
 
@@ -224,7 +232,9 @@ Similarly to *e* and *exp*, *ln* and *log* will calculate the natural/Naiperian 
 
 Please note that calculation of logarithms could be computationally intensive in some domains involving large numbers.
 
----
+***
+Next: [Integer and remainder functions](#integer)   Previous: [Trigonometry](#trigonometry)   Top: [Contents](#contents)
+***
 
 ###<a name="trigonometry">Trigonometry</a>
 
@@ -252,7 +262,9 @@ precision and rounding mode of the result:
     console.log(op1.atan2());
     console.log(op2.atan2(50));
 
----
+***
+Next: [Integer and remainder functions](#integer)   Previous: [Trigonometry](#trigonometry)   Top: [Contents](#contents)
+***
 
 ###<a name="integer">Integer and remainder functions</a>
 
