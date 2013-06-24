@@ -331,8 +331,8 @@ both numbers are equal, 1 if the bigReals number is bigger than the operand or -
     console.log(op2.cmp(op3));
     console.log(op3.cmp(-0.45877));
 
-To check if a bigReal number is not a number(*"NaN"*), infinity(*"Infinity"*), zero(*"Zero"*) a regular number(*"Regular"*) and integer
-(*"Integer"*) or an ordinary number(*"Ordinary"*), you can use the **is** function supplying as argument the type to compare with:
+To check if a bigReal number is not a number("*NaN*"), infinity("*Infinity*"), zero("*Zero*") a regular number("*Regular*") and integer
+("*Integer*") or an ordinary number("*Ordinary*"), you can use the **is** function supplying as argument the type to compare with:
 
     var bigReals = require('bigreals');
     var op1 = bigReals();
