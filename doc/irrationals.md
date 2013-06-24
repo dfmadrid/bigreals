@@ -241,6 +241,15 @@ argument. In all the cases, an optional precision and rounding mode could be pro
     console.log(op3.tan(100));
     console.log(op2.("invhyp", 100));
 
+To calculate the arc-tangent2 function, you could use *atan2* specifying as argument a number or a bigReal number and optionally a
+precision and rounding mode of the result:
+
+    var bigReals = require('bigreals');
+    var op1 = bigReals("Pi", 100);
+    
+    console.log(op1.atan2());
+    console.log(op2.atan2(50));
+
 ---
 
 ###<a name="integer">Integer and remainder functions</a>
@@ -295,6 +304,8 @@ functions, an optionally precision and rounding mode could be provided as argume
 
     console.log(op1.riemannZ(32));
     console.log(op2.gamma(64, 3));
+
+This functions will be complemented in future versions of bigReals with other related to prime numbers.
 
 ---
 
