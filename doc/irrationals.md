@@ -224,7 +224,7 @@ Please note that calculation of logarithms could be computationally intensive in
 
 ---
 
-###<a namef="trigonometry">Trigonometry</a>
+###<a name="trigonometry">Trigonometry</a>
 
 *cos*, *sin*, *tan*, *sec*, *cosec* and *cotan* functions allow to do trigonometric calculations over a bigReal number. All follow the same
 pattern in relation to arguments. If no string is provided as argument a normal trigonometric calculation will be executed. If you want to
@@ -243,7 +243,7 @@ argument. In all the cases, an optional precision and rounding mode could be pro
 
 ---
 
-###<a namef="integer">Integer and remainder functions</a>
+###<a name="integer">Integer and remainder functions</a>
 
 To round a bigReals irrational number to an integer, *toInt* function with an optional string specifying the type of rounding to be
 executed could be used. By default, *toInt* will round to the nearest integer in the direction given by a user supplied rounding
@@ -284,7 +284,46 @@ If you want to round to the nearest integer, pass the string "remainder" and opt
 
 ---
 
-###<a namef="numbertheory">Number theory</a>
+###<a name="numbertheory">Number theory</a>
+
+bigReals supports some basic calculation and functions related to number theory like Riemann's Zeta and Gamma functions. In both
+functions, an optionally precision and rounding mode could be provided as argument:
+
+    var bigReals = require('bigreals');
+    var op1 = bigReals("Pi", 100);
+    var op2 = bigreals(20);
+
+    console.log(op1.riemannZ(32));
+    console.log(op2.gamma(64, 3));
+
+---
+
+###<a name="comparison">Comparison functions</a>
+
+To compare a bigReals number with a normal number or another bigReals number, you could use the function *cmp*, which will return 0 if
+both numbers are equal, 1 if the bigReals number is bigger than the operand or -1 otherwise:
+
+    var bigReals = require('bigreals');
+    var op1 = bigReals(12.57);
+    var op2 = bigReals(12.57);
+    var op3 = bigReals(-23456.45678);
+    
+    console.log(op1.cmp(op2));
+    console.log(op2.cmp(op3));
+    console.log(op3.cmp(-0.45877));
+
+To check if a bigReal number is not a number("NaN"), infinity("Infinity"), zero("Zero") a regular number("Regular") and integer
+("Integer") or an ordinary number("Ordinary"), you can use the *is* function supplying as argument the type to compare with:
+
+    var bigReals = require('bigreals');
+    var op1 = bigReals();
+    var op2 = bigReals(12.57);
+    var op3 = bigReals(0);
+
+    console.log(op1.is("Nan"));
+    console.log(op2.is("Number"));
+    console.log(op3.is("Ordinary"));
+    console.log(op2.toInt().is("Integer"));
 
 ---
 
@@ -302,16 +341,5 @@ an optional precision and rounding mode could be provided and in the case of *ab
     console.log(op2.fac(100));
     console.log(op3.abs());
 
-To compare a bigReals number with a normal number or another bigReals number, you could use the function *cmp*, which will return 0 if
-both numbers are equal, 1 if the bigReals number is bigger than the operand or -1 otherwise:
-
-    var bigReals = require('bigreals');
-    var op1 = bigReals(12.57);
-    var op2 = bigReals(12.57);
-    var op3 = bigReals(-23456.45678);
-    
-    console.log(op1.cmp(op2));
-    console.log(op2.cmp(op3));
-    console.log(op3.cmp(-0.45877));
 
 ---
