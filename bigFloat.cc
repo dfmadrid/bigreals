@@ -30,7 +30,7 @@ void bigFloat::Init() {
   Local<FunctionTemplate> tpl = FunctionTemplate::New(New);
   tpl->SetClassName(String::NewSymbol("bigFloat"));
   
-  // Instance Vars
+  // Defaults Javascript object
   
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
   
@@ -45,7 +45,7 @@ void bigFloat::Init() {
 
   tpl->InstanceTemplate()->Set(String::NewSymbol("defaults"), defaultConf);
 
-  // Javascript Prototype of object
+  // Javascript Prototype of bigReals irrational number object
 
   tpl->PrototypeTemplate()->Set(String::NewSymbol("inspect"),
     FunctionTemplate::New(inspect)->GetFunction());
@@ -114,6 +114,8 @@ void bigFloat::Init() {
 
 }
 
+// Defaults object precision property getter
+
 Handle<Value> config::getPrecision(Local<String> property, const AccessorInfo &info) {
 
   Local<Object> self = info.Holder();
@@ -124,6 +126,8 @@ Handle<Value> config::getPrecision(Local<String> property, const AccessorInfo &i
   return Number::New(value);
 }
   
+// Defaults object precision property setter
+
 void config::setPrecision(Local<String> property, Local<Value> value, const AccessorInfo& info) {
 
   Local<Object> self = info.Holder();
@@ -139,6 +143,8 @@ void config::setPrecision(Local<String> property, Local<Value> value, const Acce
   static_cast<config*>(ptr)->precision_ = value->NumberValue();
 }
 
+// Defaults object rMode property getter
+
 Handle<Value> config::getRmode(Local<String> property, const AccessorInfo &info) {
 
   Local<Object> self = info.Holder();
@@ -149,6 +155,8 @@ Handle<Value> config::getRmode(Local<String> property, const AccessorInfo &info)
   return Uint32::New(value);
 }
   
+// Defaults object rMode property setter
+
 void config::setRmode(Local<String> property, Local<Value> value, const AccessorInfo& info) {
 
   Local<Object> self = info.Holder();
@@ -162,6 +170,13 @@ void config::setRmode(Local<String> property, Local<Value> value, const Accessor
   static_cast<config*>(ptr)->rMode_ = value->Uint32Value();
 }
 
+/* Helper function for parsing a base, a precision, a rounding mode or a number digits from user
+ * supplied arguments to a particular function.
+ * Checks if the argument exists in the specified position of Arguments& array and if it fits in
+ * the expected max/min range.
+ * If no argument exists in the specified position of Arguments& array, return defaultValue
+ */
+
 Handle<Value> bigFloat::getOpArg(int index, std::string type, const Arguments& args, Handle<Value> defaultValue){
 
   HandleScope scope;
@@ -172,6 +187,8 @@ Handle<Value> bigFloat::getOpArg(int index, std::string type, const Arguments& a
     return scope.Close(defaultValue);
   }
   else if(type == "Precision" && args[index]->IsNumber()){
+    
+    // As MPFR adjusts internally precision, Precision must be lower than MPFR_PREC_MAX or Node could crash
   
     if(args[index]->NumberValue() < 2 || args[index]->NumberValue() > MPFR_PREC_MAX - 100){
       strEnd = String::Concat(strEnd, String::Concat(Number::New(2)->ToString(), String::New(" and <= ")));
@@ -190,9 +207,12 @@ Handle<Value> bigFloat::getOpArg(int index, std::string type, const Arguments& a
       ThrowException(Exception::Error(String::Concat(strStart, strEnd)));
       return scope.Close(Undefined());
     }
+
     return scope.Close(args[index]);
   }
   else if(type == "Base" && args[index]->IsNumber()){
+  
+    // This case is used to parse both strings bases and exp/log bases
     
     if(args[index]->Uint32Value() < 2 || args[index]->Uint32Value() > 62){
       strEnd = String::Concat(strEnd, String::Concat(Number::New(2)->ToString(), String::New(" and <=")));
@@ -211,21 +231,27 @@ Handle<Value> bigFloat::getOpArg(int index, std::string type, const Arguments& a
       ThrowException(Exception::Error(String::Concat(strStart, strEnd)));
       return scope.Close(Undefined());
     }
+
     return scope.Close(args[index]);
   }
   
   return scope.Close(Undefined());
 }
 
-/* Constructor.
- * Accepts a uint64 number, a string in a provided base or a GMP integer.
- * If no argument is provided, instantiates the object to a biginteger with value 0.
+/* bigReals irrational number constructor.
+ * Accepts a number specified by a string with an optional base, an integer or double number or a string specifying a
+ * constant like log2, pi, euler's or catalan's to be used as initialization value.
+ * If no argument is provided, instantiates the number to NaN.
+ * Internally is called with a pointer to a mpfr struct as argument to return the result of operations
  */
 
 Handle<Value> bigFloat::New(const Arguments& args){
 
   HandleScope scope;
   bigFloat *obj = new bigFloat();
+
+  // Get the defaults object precision and rMode properties.
+
   Local<Object> defaults = args.This()->Get(String::New("defaults"))->ToObject();
   obj->precision_ = (mpfr_prec_t) defaults->Get(String::New("precision"))->NumberValue();
   obj->rMode_ = (mpfr_rnd_t) defaults->Get(String::New("rMode"))->Uint32Value();
@@ -288,6 +314,8 @@ Handle<Value> bigFloat::New(const Arguments& args){
   return args.This();
 }
 
+// Simulates the behaviour a Javascript's new operator
+
 Handle<Value> bigFloat::NewInstance(const Arguments& args) {
   
   HandleScope scope;
@@ -304,7 +332,10 @@ Handle<Value> bigFloat::NewInstance(const Arguments& args) {
 }
 
 
-// Returns a string when object is inspected by console.log().
+/* Returns the value, precision and rounding mode of a bigReal number inspected by console.log().
+ * The value of the bigReal number is the one needed by MPFR to exactly convert back the string to
+ * the same bigReal number rounding to the nearest.
+ */
 
 Handle<Value> bigFloat::inspect(const Arguments& args){
 
@@ -331,9 +362,11 @@ Handle<Value> bigFloat::inspect(const Arguments& args){
   return scope.Close(inspection);
 }
 
-/* Returns a string representing the bigFloat.
- * An optional base to convert the string to could be optionally provided.
- * Accepts no arguments or a int32 >= 2 and <=62.
+/* Returns a string in the optionally specified base between 2 and 62 representing the bigReal number.
+ * An optional number of most significant digits to print and rounding mode could be provided.
+ * If no base is provided, base 10 is assumed. If no number of digits is provided, MPFR will print
+ * the number of most significant digits needed to exactly convert back the string to the same bigReal
+ * number rounding to the nearest.
  */
 
 Handle<Value> bigFloat::toString(const Arguments& args) {
@@ -362,8 +395,10 @@ Handle<Value> bigFloat::toString(const Arguments& args) {
   return scope.Close(String::New(realValue.c_str()));
 }
 
-/* Gets or sets the precision of the Irrational number.
- * Accepts no arguments or a int32 >= 2 and <=62.
+/* Gets or sets the precision of the bigReal Irrational number.
+ * If a number >= 2 and <= MPFR_PREC_MAX - 100 is provided, sets the precision of the bigReal rounding to
+ * the optionally specified rounding mode and returning the new bigReal number.
+ * If no arguments are provided, returns the current precision of the bigReal.
  */
 
 Handle<Value> bigFloat::precision(const Arguments& args) {
@@ -384,8 +419,9 @@ Handle<Value> bigFloat::precision(const Arguments& args) {
     
 }
 
-/* Gets or sets the rounding mode of the irrational number.
- * Accepts no arguments or a int32 >= 2 and <=62.
+/* Gets or sets the rounding mode of the bigReal irrational number.
+ * If number >=0 and <=4 is provided, sets the new rounding mode of the bigReal and returns the new bigReal number.
+ * If no arguments are provided, returns the current rounding mode of the bigReal.
  */
 
 Handle<Value> bigFloat::rMode(const Arguments& args) {
@@ -399,17 +435,18 @@ Handle<Value> bigFloat::rMode(const Arguments& args) {
     return scope.Close(Integer::New(rMode));
   }
   else {
+    // TODO: Round the bigReal number besides changin the internal rMode field
+
     obj->rMode_ = (mpfr_rnd_t) getOpArg(0, "Rounding Mode", args, Uint32::New(obj->rMode_))->Uint32Value();
     return scope.Close(args.This());
   }
     
 }
 
-/* Addition.
- * Accepts as arguments a double or a uint64 signed integer and
- * optionally a precision and rounding mode of the operation.
- * If no precision is provided, chooses the highest precision
- * of the 2 operands.
+/* Addition with an integer, a double or another bigReal number.
+ * If operand is an integer, it will be implicitly casted to a double.
+ * Optionally a precision and rounding mode of the calculation's result could be providedd.
+ * If no precision is provided, chooses the highest precision between the ones of the two operands.
  */
 
 
@@ -449,9 +486,10 @@ Handle<Value> bigFloat::add(const Arguments& args) {
   return scope.Close(result);
 }
 
-/* Substraction, normal or modular.
- * Accepts as main argument a uint64 or a biginteger object and
- * optionally a uint64 or biginteger modulus for modular addition.
+/* Substraction with an integer, a double or another bigReal number.
+ * If operand is an integer, it will be implicitly casted to a double.
+ * Optionally a precision and rounding mode of the calculation's result could be providedd.
+ * If no precision is provided, chooses the highest precision between the ones of the two operands.
  */
 
 Handle<Value> bigFloat::sub(const Arguments& args) {
@@ -490,9 +528,10 @@ Handle<Value> bigFloat::sub(const Arguments& args) {
   return scope.Close(result);
 }
 
-/* Multiplication.
- * Accepts as main argument a double or long integer and 
- * optionally a long integer precision and unsigned int integer rounding mode of the operation.
+/* Multiplication by an integer, a double or another bigReal number.
+ * If operand is an integer, it will be implicitly casted to a double.
+ * Optionally a precision and rounding mode of the calculation's result could be providedd.
+ * If no precision is provided, chooses the highest precision between the ones of the two operands.
  */
 
 Handle<Value> bigFloat::mul(const Arguments& args) {
@@ -531,8 +570,10 @@ Handle<Value> bigFloat::mul(const Arguments& args) {
   return scope.Close(result);
 }
 
-/* Substraction.
- * Accepts as main argument a uint64 or a biginteger object and
+/* Division by an integer, a double or another bigReal number. NaN and infinity are valid results.
+ * If divisor is an integer, it will be implicitly casted to a double.
+ * Optionally a precision and rounding mode of the calculation's result could be providedd.
+ * If no precision is provided, chooses the highest precision between the ones of the two operands.
  */
 
 Handle<Value> bigFloat::div(const Arguments& args) {
@@ -570,8 +611,11 @@ Handle<Value> bigFloat::div(const Arguments& args) {
 
   return scope.Close(result);
 }
-/* Exponentiation, normal or modular.
- * Accepts as main argument a uint64 or a biginteger object and
+
+/* Exponentiation to the power of an integer, a double or another bigReal number.
+ * If exponent is an integer, it will be implicitly casted to a double.
+ * Optionally a precision and rounding mode of the calculation's result could be providedd.
+ * If no precision is provided, chooses the highest precision between the ones of the two operands.
  */
 
 Handle<Value> bigFloat::pow(const Arguments& args) {
@@ -610,8 +654,10 @@ Handle<Value> bigFloat::pow(const Arguments& args) {
   return scope.Close(result);
 }
 
-/* n-th root, normal or modular.
- * Accepts as main argument a uint64 or a biginteger object and
+/* n-th root with an integer, a double or another bigReal number as exponent.
+ * If exponent is an integer, it will be implicitly casted to a double.
+ * Optionally a precision and rounding mode of the calculation's result could be providedd.
+ * If no precision is provided, chooses the highest precision between the ones of the two operands.
  */
 
 Handle<Value> bigFloat::root(const Arguments& args) {
@@ -651,11 +697,8 @@ Handle<Value> bigFloat::root(const Arguments& args) {
   return scope.Close(result);
 }
 
-/* Natural/Neperian Logarithm.
- * Accepts as arguments a double or a uint64 signed integer and
- * optionally a precision and rounding mode of the operation.
- * If no precision is provided, chooses the highest precision
- * of the 2 operands.
+/* Natural/Napierian logarithm of the bigReal number.
+ * Optionally a precision and rounding mode of the calculation's result could be providedd.
  */
 
 
@@ -678,11 +721,10 @@ Handle<Value> bigFloat::ln(const Arguments& args) {
 
   return scope.Close(result);
 }
-/* Base 2 or base 10 Logarithm.
- * Accepts as arguments a double or a uint64 signed integer and
- * optionally a precision and rounding mode of the operation.
- * If no precision is provided, chooses the highest precision
- * of the 2 operands.
+
+/* Base 2 or base 10 Logarithm of a bigReal number exponent.
+ * Accepts as arguments a the base of the logarithm, either 2 or 10.
+ * Optionally a precision and rounding mode of the operation could be provided.
  */
 
 
@@ -719,11 +761,8 @@ Handle<Value> bigFloat::log(const Arguments& args) {
 }
 
 
-/* Exponentiation base e.
- * Accepts as arguments a double or a uint64 signed integer and
- * optionally a precision and rounding mode of the operation.
- * If no precision is provided, chooses the highest precision
- * of the 2 operands.
+/* Exponentiation base e of a bigReal number as exponent.
+ * Optionally a precision and rounding mode of could be provided.
  */
 
 
@@ -746,11 +785,10 @@ Handle<Value> bigFloat::e(const Arguments& args) {
 
   return scope.Close(result);
 }
-/* 2-th or 10-th Exponentiation base e.
- * Accepts as arguments a double or a uint64 signed integer and
- * optionally a precision and rounding mode of the operation.
- * If no precision is provided, chooses the highest precision
- * of the 2 operands.
+
+/* Base 2 or base 10 Logarithm of a bigReal number exponent.
+ * Accepts as arguments a the base of the logarithm, either 2 or 10.
+ * Optionally a precision and rounding mode of the operation could be provided.
  */
 
 
@@ -786,7 +824,10 @@ Handle<Value> bigFloat::exp(const Arguments& args) {
   return scope.Close(result);
 }
 
-/* Cos, arc-cosine and hyperbolic cosine
+/* Cosine, arc-cosine, hyperbolic cosine and inverse hyperbolic cosine of a bigReal number.
+ * Optionally a string specifying alternate cosine functions could be provided, by default normal
+ * cosine will be calculated.
+ * Optionally a precision and rounding mode of the result could be provided.
  */
 
 Handle<Value> bigFloat::cos(const Arguments& args) {
@@ -837,7 +878,10 @@ Handle<Value> bigFloat::cos(const Arguments& args) {
 }
 
 
-/* Sine, arc-sine and hyperbolic sine
+/* Sine, arc-sine, hyperbolic sine and inverse hyperbolic sine of a bigReal number.
+ * Optionally a string specifying alternate sine functions could be provided, by default normal
+ * sine will be calculated.
+ * Optionally a precision and rounding mode of the result could be provided.
  */
 
 Handle<Value> bigFloat::sin(const Arguments& args) {
@@ -888,7 +932,10 @@ Handle<Value> bigFloat::sin(const Arguments& args) {
 }
 
 
-/* Tangent, arc-tangent and hyperbolic tangent
+/* Tangent, arc-tangent, hyperbolic tangent and inverse hyperbolic tangent of a bigReal number.
+ * Optionally a string specifying alternate tangent functions could be provided, by default normal
+ * tangent will be calculated.
+ * Optionally a precision and rounding mode of the result could be provided.
  */
 
 Handle<Value> bigFloat::tan(const Arguments& args) {
@@ -940,7 +987,10 @@ Handle<Value> bigFloat::tan(const Arguments& args) {
 
 
 
-/* Arc-tangent2.
+/* Arc-tangent2 of a two bigReal numbers.
+ * An integer, a double or another bigReal number could be supplied as operand. If a number is provided, it will be
+ * casted explicitly to a double.
+ * Optionally a precision and rounding mode could be provided.
  */
 
 Handle<Value> bigFloat::atan2(const Arguments& args) {
@@ -975,7 +1025,10 @@ Handle<Value> bigFloat::atan2(const Arguments& args) {
   return scope.Close(result);
 }
 
-/* Secant and hyperbolic secant
+/* Secant and hyperbolic secant of a bigReal number.
+ * Optionally a string specifying an alternate secant function could be provided, by default normal
+ * secant will be calculated.
+ * Optionally a precision and rounding mode of the result could be provided.
  */
 
 Handle<Value> bigFloat::sec(const Arguments& args) {
@@ -1020,7 +1073,10 @@ Handle<Value> bigFloat::sec(const Arguments& args) {
 }
 
 
-/* Cosecant and hyperbolic cosecant
+/* Cosecant and hyperbolic cosecant of a bigReal number.
+ * Optionally a string specifying an alternate cosecant function could be provided, by default normal
+ * cosecant will be calculated.
+ * Optionally a precision and rounding mode of the result could be provided.
  */
 
 Handle<Value> bigFloat::cosec(const Arguments& args) {
@@ -1065,7 +1121,10 @@ Handle<Value> bigFloat::cosec(const Arguments& args) {
 }
 
 
-/* Cotangent and hyperbolic cotangent
+/* Cotangent and hyperbolic cotangent of a bigReal number.
+ * Optionally a string specifying an alternate cotangent function could be provided, by default normal
+ * cotangent will be calculated.
+ * Optionally a precision and rounding mode of the result could be provided.
  */
 
 Handle<Value> bigFloat::cotan(const Arguments& args) {
@@ -1110,7 +1169,8 @@ Handle<Value> bigFloat::cotan(const Arguments& args) {
 }
 
 
-/* Factorial.
+/* Factorial of a bigReal number.
+ * Optionally a precision and rounding mode of the result could be provided.
  */
 
 Handle<Value> bigFloat::fac(const Arguments& args) {
@@ -1135,7 +1195,12 @@ Handle<Value> bigFloat::fac(const Arguments& args) {
 }
 
 
-/* Rounding to integer fuctions
+/* Rounding to an integer fuctions.
+ * By default will round the nearest integer rounding in the given direction provided by user supplied
+ * rounding mode or the internal rounding mode of the bigReal number.
+ * Alternatively rounding functions could be optionally provided specifying the type as a string.
+ * Ceil(rounding to the next or equal), floor(rounding to the next lower or equal), round(rounding to
+ * the nearest with halfaway cases rounded away from zero) and trunc(rounding to the next toward zero).
  */
 
 Handle<Value> bigFloat::toInt(const Arguments& args) {
@@ -1437,7 +1502,7 @@ Handle<Value> bigFloat::abs(const Arguments& args) {
   return scope.Close(result);
 }
 
-/* Returns if object is NaN, Infinity, Zero, an integer or an ordinary number.*/
+/* Returns if object is NaN, Infinity, Zero, an integer an ordinary number or an ordinary number.*/
 
 Handle<Value> bigFloat::is(const Arguments& args) {
   
