@@ -3,10 +3,10 @@
 BigReals uses [GNU's MPFR](http://www.mpft.org "MPFR") for multi-precision fast calculations over irrationals numbers.
 This chapter discusses the special interface of BigReals to MPFR and how to use it.
 
-## Contents
+## <a name="contents">Contents</a>
 
 *   [Precision](#precision)
-*   [Rounding mode](#rounding)
+*   [Rounding modes](#rounding)
 *   [Initialization](#initialization)
 *   [Basic arithmetics](#arithmetics)
 *   [Exponentiation, roots and logarithms](#logexp)
@@ -16,6 +16,8 @@ This chapter discusses the special interface of BigReals to MPFR and how to use 
 *   [Number theory](#numbertheory)
 *   [Other functions](#other)
 
+---
+Next: [Rounding modes](#rounding)   Previous: [contents](#top)   Up: [BigReals Manual](manual.md)
 ---
 
 ###<a name="precision">Precision</a>
@@ -74,7 +76,7 @@ You can get or set the precision of a bigReal number by using the *precision()* 
 
 ---
 
-###<a name="rounding">Rounding Mode</a>
+###<a name="rounding">Rounding Modes</a>
 
 Rounding mode speficies the way to round the result of a calculation in case rounding is needed. The four allowed modes in BigReals are the same than MPFR ones:
 
