@@ -21,14 +21,15 @@ Next: [Precision](#precision)&nbsp;&nbsp;&nbsp;Previous: [Contents](#top)&nbsp;&
 
 ###<a name="precision">Precision</a>
 
-Precision is the of number bits used by BigReals to store internally an irrational number and could be any number between 2 and the maximum unsigned integer value
-allowed by your processor. By default, each bigReal number is created with a precision of 53 bits. This value can be changed by modifying the *precision* property of the object *defaults* of the factory/module:
+Precision is the of number bits used by BigReals to store internally an irrational number and could be any number between 2 and
+the maximum unsigned integer value allowed by your processor. By default, each bigReal number is created with a precision of 53 bits.
+This value can be changed by modifying the **precision** property of the object **defaults** of the factory/module:
 
     var bigReals = require('bigreals');
 
-    /* Settles the default precision for new numbers created to 100 bits.
-     * Previously created numbers are not affected by this change.
-     */
+    /** Settles the default precision for new numbers created to 100 bits.
+     ** Previously created numbers are not affected by this change.
+     **/
 
     bigReals.defaults.precision = 100;
 
@@ -40,8 +41,8 @@ This default precision can be overriden in a specific number by specifying a pre
 
     var op = bigReals(4.0, 16);
 
-To avoid losing precision when executing calculations, bigReals will calculate the result based on an infinite precision and then will round it to the
-higher of the operands' precisions:
+To avoid losing precision when executing calculations, bigReals will calculate the result based on an infinite precision and then
+will round it to the higher between the operands' precisions:
 
     var bigReals = require('bigreals');
 
@@ -64,7 +65,7 @@ This behaviour can be overriden by specifying a precision as argument of the cal
 
     console.log(op1.add(op2, 24);
 
-You can get or set the precision of a bigReal number by using the *precision()* function:
+You can get or set the precision of a bigReal number by using the **precision** function:
 
     var bigReals = require('bigreals');
     var op = bigReals(4.0);
@@ -78,7 +79,8 @@ Next: [Rounding modes](#rounding)&nbsp;&nbsp;&nbsp;Previous: [Precision](#precis
 
 ###<a name="rounding">Rounding modes</a>
 
-Rounding mode speficies the way to round the result of a calculation in case rounding is needed. The four allowed modes in BigReals are the same than MPFR ones:
+Rounding mode speficies the way to round the result of a calculation in case rounding is needed. The four allowed modes in BigReals
+are the same than MPFR ones:
 
 *   0 (MPFR_RNDN: round to nearest)
 *   1 (MPFR_RNDZ: round toward zero)
@@ -86,14 +88,15 @@ Rounding mode speficies the way to round the result of a calculation in case rou
 *   3 (MPFR_RNDD: round toward minus infinity)
 *   4 (MPFR_RNDA: round away from zero)
 
-Each BigReals irrational number has associated a rounding mode with it, the default mode is 0 (round to nearest). This default mode can be settled for all
-irrational numbers created with bigReals by changing the *rMode* property of the object defaults of the factory/module:
+Each BigReals irrational number has associated a rounding mode with it, the default mode is 0 (round to nearest). This default
+mode can be settled for all irrational numbers created with bigReals by changing the **rMode** property of the object defaults
+of the factory/module:
 
     var bigReals = require('bigreals');
 
-    /* Settles the default rounding mode to round toward minus infinity for new numbers created.
-     * Previously created numbers are not affected by this change.
-     */
+    /** Settles the default rounding mode to round toward minus infinity for new numbers created.
+     ** Previously created numbers are not affected by this change.
+     **/
 
     bigReals.defaults.rMode = 3;
 
@@ -105,7 +108,7 @@ This default rounding mode can be overriden for a particular bigReals irrational
 
     var op = bigReals(4.0, 16, 3);
 
-You can get or set the rounding mode of a bigReals irrational number by using the *rMode()* function:
+You can get or set the rounding mode of a bigReals irrational number by using the **rMode()** function:
 
     var bigReals = require('bigreals');
     var op = bigReals(4.0);
@@ -119,33 +122,26 @@ Next: [Initialization](#initialization)&nbsp;&nbsp;&nbsp;Previous: [Rounding mod
 
 ###<a name="initialization">Initialization</a>
 
-A bigReals irrational number can be initialized with a long integer value, a double value or a string and optionally a precision and rounding mode. In the case of double values, you can use
-dot notation or floating point notation:
+A bigReals irrational number can be initialized with a long integer value, a double value or a string and optionally a precision and
+rounding mode. In the case of double values, you can use dot notation or floating point notation:
 
     var bigReals = require('bigreals');
     var op1 = bigReals(4.04324324, 32, 3);
     var op2 = bigReals(655e-2, 24);
     var op3 = bigReals(45050003);
-
-    /* Outputs the internal representation of the three bigReals object as the one MPFR would need to represent the
-     * object rounding to the nearest.
-     */
      
     console.log(op1);
     console.log(op2);
     console.log(op3);
 
-In the case of strings, any string representing a number could be provided, the only limit is the memory available in your system. Optionally a base of the string representation could be
-provided. To specify a precision and/or rounding mode for the BigReal irrational number, the base is a mandatory argument:
+In the case of strings, any string representing a number could be provided, the only limit is the memory available in your system. Optionally
+a base of the string representation could be provided. To specify a precision and/or rounding mode for the BigReal irrational number, the
+base is a mandatory argument:
 
     var bigReals = require('bigreals');
     var op1 = bigReals("312321785473984758923758943759843759438753984753984753894754398759834759834759", 10, 5000);
     var op2 = bigReals("3f45665bac.45fbae3d", 16);
     var op3 = bigReals("4.5050003", 10, 32, 3);
-
-    /* Outputs the internal representation of the three bigReals object as the one MPFR would need to represent the 
-     * object rounding to the nearest.
-     */
 
     console.log(op1);
     console.log(op2);
@@ -168,9 +164,11 @@ Next: [Essential arithmetics](#arithmetics)&nbsp;&nbsp;&nbsp;Previous: [Exponent
 
 ###<a name="arithmetics">Essential arithmetics</a>
 
-BigReals supports basic arithmetic calculations like addition(function *add*), substracction(function *sub*), multiplication(function *mul*), and division(function *div*).
+BigReals supports basic arithmetic calculations like addition(function **add**), substracction(function **sub**), multiplication(function **mul**),
+and division(function **div**).
 All the functions follow the same pattern in relation to arguments allowed, they accept either a double, a long int or another 
-bigReal object with an optional precision and rounding mode of the calculation. The result of the calculation is another bigReal object, so operations can be concatenated:
+bigReal object with an optional precision and rounding mode of the calculation. The result of the calculation is another bigReal
+object, so operations can be concatenated:
 
     var bigReals = require('bigreals');
     var op1 = bigReals(12.32345);
@@ -187,8 +185,8 @@ Next: [Exponentiation, roots and logarithms](#logexp)&nbsp;&nbsp;&nbsp;Previous:
 
 ###<a name="logexp">Exponentation, roots and logarithms</a>
 
-To calculate the n-th power or the n-th root of a bigReal number, functions *pow* and *root* accept as exponent a double, a long integer (which will be casted to a
-double internally) or another bigReal number. Optionally a precision and rounding mode of the calculation could be supplied:
+To calculate the n-th power or the n-th root of a bigReal number, functions **pow** and **root** accept as exponent a double, a long integer
+(which will be casted to a double internally) or another bigReal number. Optionally a precision and rounding mode of the calculation could be supplied:
 
     var bigReals = require('bigreals');
     var op1 = bigReals(9);
@@ -200,8 +198,9 @@ double internally) or another bigReal number. Optionally a precision and roundin
     console.log(op2.root(2, 100));
     console.log(op2.root(2).pow(2));
 
-To quickly raise Euler's number, 2 or 10 to the power of a bigReal number, you could use the *e* function and the *exp* functions. *e* will calculate the power
-base Euler's constant and *exp* base 2 or 10, as supplied as argument. In both cases, an optional precision and rounding mode could be provided:
+To quickly raise Euler's number, 2 or 10 to the power of a bigReal number, you could use the **e** function and the **exp** functions. **e** will
+calculate the power base Euler's constant and **exp** base 2 or 10, as supplied as argument. In both cases, an optional precision and rounding mode
+could be provided:
 
     var bigReals = require('bigreals');
     var op1 = bigReals(9);
@@ -213,7 +212,7 @@ base Euler's constant and *exp* base 2 or 10, as supplied as argument. In both c
     console.log(op2.exp(2));
     console.log(op2.exp(10, op3));
 
-Similarly to *e* and *exp*, *ln* and *log* will calculate the natural/Naiperian logarithm and base 2 or base 10 logarithm of a bigReal number:
+Similarly to **e** and **exp**, **ln** and **log** will calculate the natural/Naiperian logarithm and base 2 or base 10 logarithm of a bigReal number:
 
     var bigReals = require('bigreals');
     var op1 = bigReals(9);
@@ -232,7 +231,7 @@ Next: [Trigonometry](#trigonometry)&nbsp;&nbsp;&nbsp;Previous: [Exponentiation, 
 
 ###<a name="trigonometry">Trigonometry</a>
 
-*cos*, *sin*, *tan*, *sec*, *cosec* and *cotan* functions allow to do trigonometric calculations over a bigReal number. All follow the same
+**cos**, **sin**, **tan**, **sec**, **cosec** and **cotan** functions allow to do trigonometric calculations over a bigReal number. All follow the same
 pattern in relation to arguments. If no string is provided as argument a normal trigonometric calculation will be executed. If you want to
 calculate the inverse("arc"), the hyperbolic("hyp") or the inverse hyperbolic("invhyp") version of the function, just supply the string as
 argument. In all the cases, an optional precision and rounding mode could be provided:
@@ -247,7 +246,7 @@ argument. In all the cases, an optional precision and rounding mode could be pro
     console.log(op3.tan(100));
     console.log(op2.("invhyp", 100));
 
-To calculate the arc-tangent2 function, you could use *atan2* specifying as argument a number or a bigReal number and optionally a
+To calculate the arc-tangent2 function, you could use **atan2** specifying as argument a number or a bigReal number and optionally a
 precision and rounding mode of the result:
 
     var bigReals = require('bigreals');
@@ -261,10 +260,10 @@ Next: [Integer and remainder functions](#integer)&nbsp;&nbsp;&nbsp;Previous: [Tr
 
 ###<a name="integer">Integer and remainder functions</a>
 
-To round a bigReals irrational number to an integer, *toInt* function with an optional string specifying the type of rounding to be
-executed could be used. By default, *toInt* will round to the nearest integer in the direction given by a user supplied rounding
+To round a bigReals irrational number to an integer, **toInt** function with an optional string specifying the type of rounding to be
+executed could be used. By default, **toInt** will round to the nearest integer in the direction given by a user supplied rounding
 mode. This rounding mode will be the one passed as argument to the function or the one associated with the bigReal number upon
-creation or by calls to *precision* function:
+creation or by calls to **precision** function:
  
     var bigReals = require('bigreals');
     var op = bigReals("Pi", 100);
@@ -285,7 +284,7 @@ precision argument:
     console.log(op2.toInt("round"));
     console.log(op2.toInt("trunc"));
 
-To calculate the remainder of the division of a bigReal number by a quotient, you could use the *mod* function. By default, *mod*
+To calculate the remainder of the division of a bigReal number by a quotient, you could use the **mod** function. By default, **mod**
 will calculate the remainder of the division by the number or bigReal number passed as argument rounding towards zero with an optional precision.
 If you want to round to the nearest integer, pass the string "remainder" and optionally a precision as argument:
 
@@ -313,15 +312,14 @@ functions, an optionally precision and rounding mode could be provided as argume
     console.log(op1.riemannZ(32));
     console.log(op2.gamma(64, 3));
 
-This functions will be complemented in future versions of bigReals with other related to prime numbers.
+These functions will be complemented in future versions of bigReals with other related to prime numbers.
 
 ***
 Next: [Comparison Functions](#comparison)&nbsp;&nbsp;&nbsp;Previous: [Number theory](#numbertheory)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
 
-
 ###<a name="comparison">Comparison functions</a>
 
-To compare a bigReals number with a normal number or another bigReals number, you could use the function *cmp*, which will return 0 if
+To compare a bigReals number with a normal number or another bigReals number, you could use the function **cmp**, which will return 0 if
 both numbers are equal, 1 if the bigReals number is bigger than the operand or -1 otherwise:
 
     var bigReals = require('bigreals');
@@ -333,8 +331,8 @@ both numbers are equal, 1 if the bigReals number is bigger than the operand or -
     console.log(op2.cmp(op3));
     console.log(op3.cmp(-0.45877));
 
-To check if a bigReal number is not a number("NaN"), infinity("Infinity"), zero("Zero") a regular number("Regular") and integer
-("Integer") or an ordinary number("Ordinary"), you can use the *is* function supplying as argument the type to compare with:
+To check if a bigReal number is not a number(*"NaN"*), infinity(*"Infinity"*), zero(*"Zero"*) a regular number(*"Regular"*) and integer
+(*"Integer"*) or an ordinary number(*"Ordinary"*), you can use the **is** function supplying as argument the type to compare with:
 
     var bigReals = require('bigreals');
     var op1 = bigReals();
@@ -351,8 +349,8 @@ Next: [Other functions](#other)&nbsp;&nbsp;&nbsp;Previous: [Comparison functions
 
 ###<a name="other">Other functions</a>
 
-To calculate the factorial or absolute value of a bigReals number, you could use *fac* and *abs* functions. In the case of *fac* function,
-an optional precision and rounding mode could be provided and in the case of *abs* and optional rounding mode of the calculation:
+To calculate the factorial or absolute value of a bigReals number, you could use **fac** and **abs** functions. In the case of **fac** function,
+an optional precision and rounding mode could be provided and in the case of **abs** and optional rounding mode of the calculation:
 
     var bigReals = require('bigreals');
     var op1 = bigReals(20);
