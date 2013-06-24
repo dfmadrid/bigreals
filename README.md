@@ -6,11 +6,11 @@ loop-optimized calculations and bit manipulations over big integers and big irra
 
 In a nutshell, bigReals offers the following features:
 
-    * Easy and fast modular arithmetics.
-    * Comprehensive trigonometric, exponentiation and logarithm functions.
-    * Special numbers support(NaN, Infinity, Pi, Euler's and Catalan's constants ...).
-    * Loop optimized functions to speed up calculation from Javascript.
-    * Precision of irrationals calculations is chosen based on the highest between the operand's precision if none is provided as argument.
+   * Easy and fast modular arithmetics.
+   * Comprehensive trigonometric, exponentiation and logarithm functions.
+   * Special numbers support(NaN, Infinity, Pi, Euler's and Catalan's constants ...).
+   * Loop optimized functions to speed up calculation from Javascript.
+   * Precision of irrationals calculations is chosen based on the highest between the operand's precision if none is provided as argument.
 
 bigReals is the addon used by [cryptatoo](https://github.com/dfmadrid/cryptatoo) to perform cryptographic analysis and attacks over
 large numbers like RSA keys of 1024 bits. bigReals is a work in progress, currently integer and irrationals support is fully operational but
