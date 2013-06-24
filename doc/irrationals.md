@@ -365,4 +365,4 @@ an optional precision and rounding mode could be provided and in the case of *ab
 
 
 ***
-Previous: [Other functions](#other)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)&nbsp;&nbsp;&nbsp;Up: [BiReals manual](manual.md)
+Previous: [Other functions](#other)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)&nbsp;&nbsp;&nbsp;Up: [BigReals manual](manual.md)
