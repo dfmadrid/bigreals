@@ -17,7 +17,7 @@ This chapter discusses the special interface of BigReals to MPFR and how to use 
 *   [Other functions](#other)
 
 ***
-Next: [Precision](#precision)   Previous: [Contents](#top)   Up: [BigReals manual](manual.md)
+Next: [Precision](#precision)	Previous: [Contents](#top)	Up: [BigReals manual](manual.md)
 
 ###<a name="precision">Precision</a>
 
@@ -74,7 +74,7 @@ You can get or set the precision of a bigReal number by using the *precision()* 
     console.log("New precision of op is = " + op.precision());
 
 ***
-Next: [Rounding modes](#rounding)   Previous: [Precision](#precision)   Top: [Contents](#contents)
+Next: [Rounding modes](#rounding)	Previous: [Precision](#precision)	Top: [Contents](#contents)
 
 ###<a name="rounding">Rounding modes</a>
 
@@ -115,7 +115,7 @@ You can get or set the rounding mode of a bigReals irrational number by using th
     console.log("New rounding mode of op is = " + op.rMode());
 
 ***
-Next: [Initialization](#initialization)   Previous: [Rounding modes](#rounding)   Top: [Contents](#contents)
+Next: [Initialization](#initialization)	Previous: [Rounding modes](#rounding)	Top: [Contents](#contents)
 
 ###<a name="initialization">Initialization</a>
 
@@ -164,7 +164,7 @@ supports initialization to any of those constants with an optional precision and
     console.log(euler);
     
 ***
-Next: [Essential arithmetics](#arithmetics)   Previous: [Exponentiation, roots and logarithms](#logexp)   Top: [Contents](#contents)
+Next: [Essential arithmetics](#arithmetics)	Previous: [Exponentiation, roots and logarithms](#logexp)	Top: [Contents](#contents)
 
 ###<a name="arithmetics">Essential arithmetics</a>
 
@@ -183,7 +183,7 @@ bigReal object with an optional precision and rounding mode of the calculation. 
     console.log(op3.div(op2).sub(2.57));
     
 ***
-Next: [Exponentiation, roots and logarithms](#logexp)   Previous:[Essential arithmetics](#arithmetics)   Top: [Contents](#contents)
+Next: [Exponentiation, roots and logarithms](#logexp)	Previous:[Essential arithmetics](#arithmetics)	Top: [Contents](#contents)
 
 ###<a name="logexp">Exponentation, roots and logarithms</a>
 
@@ -228,7 +228,7 @@ Similarly to *e* and *exp*, *ln* and *log* will calculate the natural/Naiperian 
 Please note that calculation of logarithms could be computationally intensive in some domains involving large numbers.
 
 ***
-Next: [Trigonometry](#trigonometry)   Previous: [Exponentiation, roots and logarithms](#logexp)   Top: [Contents](#contents)
+Next: [Trigonometry](#trigonometry)	Previous: [Exponentiation, roots and logarithms](#logexp)	Top: [Contents](#contents)
 
 ###<a name="trigonometry">Trigonometry</a>
 
@@ -257,7 +257,7 @@ precision and rounding mode of the result:
     console.log(op2.atan2(50));
 
 ***
-Next: [Integer and remainder functions](#integer)   Previous: [Trigonometry](#trigonometry)   Top: [Contents](#contents)
+Next: [Integer and remainder functions](#integer)	Previous: [Trigonometry](#trigonometry)	Top: [Contents](#contents)
 
 ###<a name="integer">Integer and remainder functions</a>
 
@@ -299,7 +299,7 @@ If you want to round to the nearest integer, pass the string "remainder" and opt
     console.log(op2.mod("remainder", op1));
 
 ***
-Next: [Number theory](#numbertheory)   Previous: [Integer and remainder functions](#integer)   Top: [Contents](#contents)
+Next: [Number theory](#numbertheory)	Previous: [Integer and remainder functions](#integer)	Top: [Contents](#contents)
 
 ###<a name="numbertheory">Number theory</a>
 
@@ -316,7 +316,7 @@ functions, an optionally precision and rounding mode could be provided as argume
 This functions will be complemented in future versions of bigReals with other related to prime numbers.
 
 ***
-Next: [Comparison Functions](#comparison)   Previous: [Number theory](#numbertheory)   Top: [Contents](#contents)
+Next: [Comparison Functions](#comparison)	Previous: [Number theory](#numbertheory)	Top: [Contents](#contents)
 
 
 ###<a name="comparison">Comparison functions</a>
@@ -347,7 +347,7 @@ To check if a bigReal number is not a number("NaN"), infinity("Infinity"), zero(
     console.log(op2.toInt().is("Integer"));
 
 ***
-Next: [Other functions](#other)   Previous: [Comparison functions](#comparison)   Top: [Contents](#contents)
+Next: [Other functions](#other)	Previous: [Comparison functions](#comparison)	Top: [Contents](#contents)
 
 ###<a name="other">Other functions</a>
 
@@ -365,4 +365,4 @@ an optional precision and rounding mode could be provided and in the case of *ab
 
 
 ***
-Previous: [Other functions](#other)   Top: [Contents](#contents)   Up: [BiReals manual](manual.md)
+Previous: [Other functions](#other)	Top: [Contents](#contents)	Up: [BiReals manual](manual.md)
