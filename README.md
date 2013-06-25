@@ -1,15 +1,32 @@
 bigReals
 ========
 
-node.js native c/c++ addon using [gmp](http://gmplib.org/) and [mpfr](http://www.mpfr.org/) to perform fast, infinite precision, loop-optimized calculations and bit manipulations over big integers, big rationals and big floating point numbers.
+node.js native c/c++ addon using [gmp](http://gmplib.org/) and [mpfr](http://www.mpfr.org/) to perform fast, infinite precision,
+loop-optimized calculations and bit manipulations over big integers and big irrationals numbers.
 
-bigReals is the addon used by [cryptatoo](https://github.com/dfmadrid/cryptatoo) to perform cryptographic analysis and attacks over large numbers like RSA keys of 1024 bits. bigReals is a work in progress, currently only big integer support is fully operational.
+In a nutshell, bigReals offers the following features:
+
+   * Easy and fast modular arithmetics.
+   * Comprehensive trigonometric, exponentiation and logarithm functions.
+   * Special numbers support(NaN, Infinity, Pi, Euler's and Catalan's constants ...).
+   * Loop optimized functions to speed up calculation from Javascript.
+   * Precision of irrationals calculations is chosen based on the highest between the operand's precision if none is provided as argument.
+
+bigReals is the addon used by [cryptatoo](https://github.com/dfmadrid/cryptatoo) to perform cryptographic analysis and attacks over
+large numbers like RSA keys of 1024 bits. bigReals is a work in progress, currently integer and irrationals support is fully operational but
+new functions and improvements will be added in future versions.
 
 Installation
 ------------
-bigReals has been tested on Linux, but should compile and work fine in Windows or Mac provided [gmp](http://gmplib.org/) sources are installed. To install gmp's sources on Ubuntu Linux:
+bigReals has been tested on Linux, but should compile and work fine in Windows or Mac provided [gmp](http://gmplib.org/) and
+[mpfr](http://www.mpfr.org) sources are installed. To install gmp's sources on Ubuntu Linux:
 
     $ sudo apt-get install libgmp-dev
+
+If you run a linux distribution, is quite likely you already have installed mpfr in your system, you could check it with the
+following command:
+
+    $ locate mpfr.h
 
 While a npm package is created, you can install bigReals cloning from github:
 
@@ -84,7 +101,9 @@ Hash table creation and lookup using special loop-optimized functions:
 
 Contributions
 -------------
-If you have any idea, performance improvement or function missing that would be interesting to have included in bigReals, send an email to &lt;david.fdmv@gmail.com&gt; or open a pull request in Github. If you find a bug, please open an issue on Github with the steps to reproduce it. Patches are more than welcome, of course.
+If you have any idea, performance improvement or function missing particularly related to cryptography or number theory that
+would be interesting to have included in bigReals, send an email to &lt;david.fdmv@gmail.com&gt; or open a pull request in
+Github. If you find a bug, please open an issue on Github with the steps to reproduce it.
 
 License
 -------

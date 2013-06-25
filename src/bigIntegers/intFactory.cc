@@ -6,18 +6,20 @@
 
 using namespace v8;
 
-Handle<Value> bigInteger(const Arguments& args) {
+Handle<Value> factory(const Arguments& args) {
+
   HandleScope scope;
 
   return scope.Close(bigInt::NewInstance(args));
 }
 
 void InitAll(Handle<Object> exports, Handle<Object> module) {
+
   bigInt::Init();
 
   module->Set(String::NewSymbol("exports"),
-    FunctionTemplate::New(bigInteger)->GetFunction());
+    FunctionTemplate::New(factory)->GetFunction());
 
 }
 
-NODE_MODULE(bigInteger, InitAll)
+NODE_MODULE(bigIntegers, InitAll)

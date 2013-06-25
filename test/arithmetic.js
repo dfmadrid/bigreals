@@ -1,16 +1,17 @@
 
 /*
  * Tests for normal arithmetic operations with integers 
- * and bigReal objects as operands
+ * and bigInteger objects as operands
  */
 
 var assert = require('assert');
-var bigReal = require('../index.js');
+var bigReals = require('../index.js');
+var bigInteger = bigReals.integers;
 
-var op1 = bigReal(6);
-var op2 = bigReal(2);
-var op3 = bigReal(9);
-var remainder = bigReal(1);
+var op1 = bigInteger(6);
+var op2 = bigInteger(2);
+var op3 = bigInteger(9);
+var remainder = bigInteger(1);
 
 var getRootRem = function(base, root){
   base.root(remainder, root);
@@ -22,7 +23,8 @@ var getDivRem = function(dividend, remainder, divisor){
   return remainder;
   }
   
-console.log("Arithmetic tests:\n");
+console.log("Integer arithmetic tests:\n");
+
 
 assert.equal('12', op1.mul(2).toString());
 console.log('6 * 2 = 12 -- Ok');
@@ -69,5 +71,5 @@ console.log('6 << 2 = 24 -- Ok');
 assert.equal('1', op1.rShift(2).toString());
 console.log('6 >> 2 = 1 -- Ok');
 
-console.log("\nArithmetic tests -- Ok\n");
+console.log("\nInteger arithmetic tests -- Ok\n");
 

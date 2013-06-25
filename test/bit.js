@@ -4,10 +4,11 @@
  */
 
 var assert = require('assert');
-var bigReal = require('../index.js');
+var bigReals = require('../index.js');
+var bigInteger = bigReals.integers;
 
-var op1 = bigReal(15);
-var op2 = bigReal(14);
+var op1 = bigInteger(15);
+var op2 = bigInteger(14);
 
 console.log("Logical and bit manipulation tests:\n");
 

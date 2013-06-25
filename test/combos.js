@@ -6,11 +6,12 @@
  */
 
 var assert = require('assert');
-var bigReal = require('../index.js');
+var bigReals = require('../index.js');
+var bigInteger = bigReals.integers;
 
-var op1 = bigReal(6);
-var op2 = bigReal(2);
-var op3 = bigReal(3);
+var op1 = bigInteger(6);
+var op2 = bigInteger(2);
+var op3 = bigInteger(3);
 
 console.log("Combined operations tests:\n");
 

@@ -1,18 +1,20 @@
 
 /*
  * Tests for modular arithmetic operations with integers 
- * and bigReal objects as operands and an integer or BigReal
+ * and bigInteger objects as operands and an integer or BigReal
  * object as a modulus
  */
 
 var assert = require('assert');
-var bigReal = require('../index.js');
-var op1 = bigReal(10);
-var op2 = bigReal(2);
-var op3 = bigReal(5);
-var op4 = bigReal(25);
-var mod = bigReal(3);
-var remainder = bigReal(1);
+var bigReals = require('../index.js');
+var bigInteger = bigReals.integers;
+
+var op1 = bigInteger(10);
+var op2 = bigInteger(2);
+var op3 = bigInteger(5);
+var op4 = bigInteger(25);
+var mod = bigInteger(3);
+var remainder = bigInteger(1);
 
 console.log("Modular arithmetic tests:\n");
 
