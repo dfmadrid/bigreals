@@ -93,26 +93,39 @@ Next: [Logical and bit-wise functions](#logical)&nbsp;&nbsp;&nbsp;Previous: [Ess
 
 ###<a name="logical">Logical and bit-wise functions</a>
 
-BigReals supports basic arithmetic calculations like addition(function **add**), substracction(function **sub**), multiplication(function **mul**),
-and division(function **div**).
-All the functions follow the same pattern in relation to arguments allowed, they accept either a double, a long int or another 
-bigReal object with an optional precision and rounding mode of the calculation. The result of the calculation is another bigReal
-object, so operations can be concatenated:
+BigReals integers aims at providing a powerful interface for dealing with bit/byte calculations. Basic logical calculations like xor, AND, OR are supported
+through *exor*, *and* and *or* functions. All those functions could be passed a long integer or another bigReals integer as operand:
 
-    var bigReals = require('bigreals');
-    var op1 = bigReals(12.32345);
-    var op2 = bigReals(5.4353454);
-    var op3 = bigReals(234.34);
+    var bigInteger = require('bigreals').integers;
     
-    console.log(op1.add(100));
-    console.log(op3.add(0.66));
-    console.log(op2.mul(10));
-    console.log(op3.div(op2).sub(2.57));
+    var op1 = bigInteger(36);
+    var op2 = bigInteger(50);
+    var op3 = bigInteger(5);
+ 
+    console.log(op1.exor(6));
+    console.log(op1.and(op2));
+    console.log(op1.or(8));
+
+Besides that, logical left shift and right shift calculations can be executed by calling *lshift* and *rshift* functions with a long integer or bigReals
+integer operand representing the number of positions/powers of 2 to shift. Optionally, a long integer or bigReals integer could be passed as modulus as
+in fact, those operations are a multiplication and a division by a power of 2 respectively:
+
+    var bigInteger = require('bigreals').integers;
+    
+    var op1 = bigInteger(36);
+    var op2 = bigInteger(50);
+    var op3 = bigInteger(5);
+ 
+    console.log(op1.lshift(6));
+    console.log(op1.lshift(op3));
+    console.log(op2.rshift(3));
+
+In the next version of bigReals, logical functions will be extended to allow the user to optionally operate only on a specific bit or byte.
     
 ***
-Next: [Exponentiation, roots and logarithms](#logexp)&nbsp;&nbsp;&nbsp;Previous:[Essential arithmetics](#arithmetics)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
+Next: [Comparison functions](#comparison)&nbsp;&nbsp;&nbsp;Previous:[Logical and bit-wise functions](#logical)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
 
-###<a name="logexp">Exponentation, roots and logarithms</a>
+###<a name="comparison">Comparison functions</a>
 
 To calculate the n-th power or the n-th root of a bigReal number, functions **pow** and **root** accept as exponent a double, a long integer
 (which will be casted to a double internally) or another bigReal number. Optionally a precision and rounding mode of the calculation could be supplied:
