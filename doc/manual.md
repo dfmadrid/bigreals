@@ -6,13 +6,13 @@ found at GitHub's [bigReals project repository](https://github.com/dfmadrid/bigr
 ## <a name="contents">Contents</a>
 
 *   [About bigReals](#about)
-*   [Changelog](#changelog)
-*   [License](#license)
 *   [Compatibility](#compatibility)
 *   [Installation](#installation)
-*   [Basic usage](#basic)
+*   [Basic usage](#basics)
 *   [Integers manual](integers.md)
 *   [Irrationals manual](irrationals.md)
+*   [Changelog](#changelog)
+*   [License](#license)
 
 ***
 Next: [About bigReals](#about)&nbsp;&nbsp;&nbsp;Previous: [Contents](#top)&nbsp;&nbsp;&nbsp;Up: [BigReals manual](manual.md)
@@ -23,13 +23,77 @@ bigReals is a node.js native addon written in C/C++ using GNU's [gmp](http://www
 libraries for infinite/multi precision fast calculations over big integers and irrationals numbers. Both *gmp* and *mpfr* are state-of-the-art
 libraries in performance with most of its functions implemented in assembly language. bigReals focuses in improving the usability and speed of
 calculations with the libraries from node.js, adding some special functions to improve performance or add new functionalities.
+    
+***
+Next: [Compatibility](#compatibility)&nbsp;&nbsp;&nbsp;Previous: [License](#license)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
+
+###<a name="compatibility">Compatibility</a>
+
+BigReals has been tested under *gmp* version 5.0.5 and *mpfr* version 3.1.1 in Ubuntu Linux amd64-i386, but should compile and work in other systems,
+either 32 or 64bits in Windows, Linux or Apple platforms.
+
+If you find problems or bugs compiling using bigReals in other systems or with other versions of *gmp* or *mpfr* installed, please open an
+issue in GitHub's [bigReals project repository](https://github.com/dfmadrid/bigreals).
+    
+***
+Next: [Installation](#installation)&nbsp;&nbsp;&nbsp;Previous:[Compatibility](#compatibility)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
+
+###<a name="installation">Installation</a>
+
+Installation in Linux/OS-X platforms is quite straightforward, just use your favorite package manager to install libgmp and libmpfr sources:
+
+    $ sudo apt-get install libgmp-dev
+    $ sudo apt-get install libmpfr-dev
+
+Anyway, is quite feasible you already have installed libmpfr-dev package in your system. 
+
+Once gmp's and mpfr's sources are installed, clone bigReals project from github into a node_modules folder in the path of your nodejs
+project:
+
+    $ git clone git://github.com/dfmadrid/bigreals.git
+
+Then cd to the directory and execute npm install to build bigReals modules:
+
+    $ cd bigreals
+    $ npm install
+
+Installation in Windows platforms in equally simple and requires the same steps if you have installed all the required components that
+**node-gyp** uses to compile and build native nodejs addons:
+
+*   Python 2.7.3
+*   MS Visual Studio C++ 2010 for WXP/Vista/7 32bits systems
+*   MS Visual Studio C++ 2010 and/or Windows 7 SDK for WXP/Vista/7 64 bits systems
+*   MS Visual Studio C++ 2010 for W7/8
+
+Please check **node-gyp** [project's page](https://github.com/TooTallNate/node-gyp) for more details and troubleshooting.
+
+Next: [Basic usage](#basics)&nbsp;&nbsp;&nbsp;Previous:[Installation](#installation)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
+
+###<a name="basics">Basic usage</a>
+
+BigReals exposes to Javascript two factory functions for creating irrational numbers using **mpfr** and integers-only
+numbers using **gmp**. To create a bigReals number, just call the appropiate factory:
+
+    var biginteger = require('bigreals').integers;
+    var bigreal = require('bigreals');
+
+    var op1 = bigreal("Pi", 100);
+    var op2 = biginteger(1223435345465656767678678768988879789789789879879);
+
+    console.log(op1);			
+    console.log(op2);
+
+Each factory/interface has its own unique characteristics and functions. Integers factory is suitable for lightway, fast 
+calculations like those involved in cryptography and irrationals factory is a general purpose interface for dealing with
+integers, floating point number and special numbers and constants with support for trigonometry, logarithms, etc. Please
+check the irrationals and integer manuals for more details about both factories.
 
 ***
-Next: [changelog](#changelog)&nbsp;&nbsp;&nbsp;Previous: [About bigReals](#about)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
+Next: [changelog](#changelog)&nbsp;&nbsp;&nbsp;Previous: [Basic usage](#basics)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
 
 ###<a name="changelog">Changelog</a>
 
-Below you could find the differences between the last released version of bigReals and the past one:
+Below you could find the differences between a specific released version of bigReals and the previous one:
 
 #### 0.6.0
 
@@ -57,80 +121,5 @@ THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
-    
 ***
-Next: [Compatibility](#compatibility)&nbsp;&nbsp;&nbsp;Previous: [License](#license)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
-
-###<a name="compatibility">Compatibility</a>
-
-BigReals has been tested with *gmp* version 5.0.5 and *mpfr* version 4.0 in Ubuntu Linux 64bits, but should compile and work in other systems,
-either 32 or 64bits in Windows, Linux or Apple platforms.
-
-If you find problems or bugs compiling or using bigReals in other systems or with other versions of *gmp* or *mpfr* installed, please open an
-issue in GitHub's [bigReals project repository](https://github.com/dfmadrid/bigreals).
-    
-***
-Next: [Installation](#installation)&nbsp;&nbsp;&nbsp;Previous:[Compatibility](#compatibility)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
-
-###<a name="installation">Installation</a>
-
-A bigReals integer could be compared with a long integer or another bigReals integer with the **cmp** function, which will return 0 if both numbers
-are equal, >0 if the argument is smaller or <0 if bigger:
-
-    var bigReals = require('bigreals').integers;
-
-    var op1 = bigReals(9);
-    var op2 = bigReals(12);
-    
-    console.log(op1.cmp(9));
-    console.log(op2.cmp(op1));
-    console.log(op1.cmp(op2);
-
-Next: [Basic usage](#basics)&nbsp;&nbsp;&nbsp;Previous:[Installation](#installation)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
-
-###<a name="basics">Basic usage</a>
-
-BigReals combo functions execute several calculations in C/C++ before returning the result to NodeJS, which results in fast calculations mainly
-targeted to be executed inside loops. Besides that, all combo functions will add the result of the calculation to the existing value of the
-bigReals integer. Current combo functions in bigReals are **addMul**, **subMul** and **accMul**. All the functions allow an optional long
-integer or bigReals integer modulus for modular calculations:
-
-    var bigReals = require('bigreals').integers;
-
-    var op1 = bigReals(9);
-    var op2 = bigReals(12);
-    var modulus = bigReals(3);
-
-    console.log(op1.addMul(9));			// op1 = op1 + op1 * 9
-    console.log(op1.addMul(9, modulus));    	// op1 = op1 + op1 * 9 mod 3 
-    console.log(op2.subMul(3));         	// op2 = op2 - op2 * 3
-    console.log(op1.accMul(op2, modulus);   	// op1 = op1 * op2 mod 3
-
-In future versions, combo functions will allow to specify a maximum value a bigReal integer could have to avoid reallocation of memory in executions
-inside loops, speeding up the calculation even more.
-
-***
-Next: [Other functions](#other)&nbsp;&nbsp;&nbsp;Previous: [Combo functions](#combos)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
-
-To obtain a string representing the bigReals integer, function **toString** could be used with an optinal string base between 2 and 62
-as argument. If no base is provided, base 10 is assumed:
-
-
-    var bigReals = require('bigreals').integers;
-
-    var op1 = bigReals("ded4b562a4e56432de5", 16);
- 
-    console.log(op1.toString());
-    console.log("Value of op1 is = " + op1);	// toString() will called explictly by Javascript/NodeJS
-    console.log(op1.toString(16));
-
-When you inspect a bigReals integer with console log, an object with a string representing the number in base 10 will be obtained:
- 
-    var bigReals = require('bigreals').integers;
-
-    var op1 = bigReals("ded4b562a4e56432de5", 16);
- 
-    console.log(op1);
-
-***
-Previous: [Other functions](#other)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)&nbsp;&nbsp;&nbsp;Up: [BigReals manual](manual.md)
+Previous: [license](#license)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)&nbsp;&nbsp;&nbsp;Up: [BigReals manual](manual.md)
