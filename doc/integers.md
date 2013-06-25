@@ -84,7 +84,7 @@ with an optional modulus to convert the calculation into a modular one. Modulus 
 Besides that, bigReals integers support calculations like n-th roots and divisions that can raise a non-integer value through **root** and **div** functions.
 If the first argument passed is a long integer, a n-th root or division will be calculated rounding result to nearest or equal integer(ceil). In case is
 a bigReals integer, it will be used to store the remainder of the calculation. In both cases, an optional long integer or bigReals integer last argument
-taken as modulus could be supplyind to execute a modular calculation.
+taken as modulus could be supplying to execute a modular calculation.
     
     var bigInteger = require('bigreals').integers;
     
@@ -190,12 +190,31 @@ integer or bigReals integer modulus for modular calculations:
     console.log(op2.subMul(3));         	// op2 = op2 - op2 * 3
     console.log(op1.accMul(op2, modulus);   	// op1 = op1 * op2 mod 3
 
-In future versions, combo functions will allow to specify a maximum value the variable to avoid reallocation of memory in executions inside
-loops, speeding up the calculation even more.
+In future versions, combo functions will allow to specify a maximum value a bigReal integer could have to avoid reallocation of memory in executions
+inside loops, speeding up the calculation even more.
 
 ***
 Next: [Other functions](#other)&nbsp;&nbsp;&nbsp;Previous: [Combo functions](#combos)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
 
+To obtain a string representing the bigReals integer, function **toString** could be used with an optinal string base between 2 and 62
+as argument. If no base is provided, base 10 is assumed:
+
+
+    var bigReals = require('bigreals').integers;
+
+    var op1 = bigReals("ded4b562a4e56432de5", 16);
+ 
+    console.log(op1.toString());
+    console.log("Value of op1 is = " + op1);	// toString() will called explictly by Javascript/NodeJS
+    console.log(op1.toString(16));
+
+When you inspect a bigReals integer with console log, an object with a string representing the number in base 10 will be obtained:
+ 
+    var bigReals = require('bigreals').integers;
+
+    var op1 = bigReals("ded4b562a4e56432de5", 16);
+ 
+    console.log(op1);
 
 ***
 Previous: [Other functions](#other)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)&nbsp;&nbsp;&nbsp;Up: [BigReals manual](manual.md)
