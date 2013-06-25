@@ -11,153 +11,68 @@ found at GitHub's [bigReals project repository](https://github.com/dfmadrid/bigr
 *   [Compatibility](#compatibility)
 *   [Installation](#installation)
 *   [Basic usage](#basic)
-*   [Integers manual](#integers)
-*   [Irrationals manual](#irrationals)
+*   [Integers manual](integers.md)
+*   [Irrationals manual](irrationals.md)
 
 ***
-Next: [Initialization](#initialization)&nbsp;&nbsp;&nbsp;Previous: [Contents](#top)&nbsp;&nbsp;&nbsp;Up: [BigReals manual](manual.md)
+Next: [About bigReals](#about)&nbsp;&nbsp;&nbsp;Previous: [Contents](#top)&nbsp;&nbsp;&nbsp;Up: [BigReals manual](manual.md)
 
-###<a name="initialization">Initialization</a>
+###<a name="about">About bigReals</a>
 
-To create a bigReals integer number, require the bigReals integers factory and provide as argument a long integer or a string in an optional base
-representing the bigReals integer number. 
-
-    var bigInteger = require('bigreals').integers;
-
-    var op1 = bigInteger(23454543534);
-    var op2 = bigInteger("323423432423435345345453455369565860948598649586094856908459608459864095864095864905594864985");
-    var op3 = bigInteger("3f4d532a4cba56455b64ff", 16);
-
-    console.log(op1);
-    console.log(op2);
-    console.log(op3);
-
-In the case of strings supplied as argument, a default base 10 is assumed unless otherwise provided. If factory is called with no
-arguments, the bigReals integer number will initialized with the value 0.
+bigReals is a node.js native addon written in C/C++ using GNU's [gmp](http://www.gmp.org) and [mpfr](http://www.mpfr.org) arithmetic
+libraries for infinite/multi precision fast calculations over big integers and irrationals numbers. Both *gmp* and *mpfr* are state-of-the-art
+libraries in performance with most of its functions implemented in assembly language. bigReals focuses in improving the usability and speed of
+calculations with the libraries from node.js, adding some special functions to improve performance or add new functionalities.
 
 ***
-Next: [Modular arithmetics](#modular)&nbsp;&nbsp;&nbsp;Previous: [Initialization](#initialization)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
+Next: [changelog](#changelog)&nbsp;&nbsp;&nbsp;Previous: [About bigReals](#about)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
 
-###<a name="modular">Modular arithmetics</a>
+###<a name="changelog">Changelog</a>
 
-For fast and easy modular arithmetics, all the functions involving calculations accept an optional argument to be treated as the
-modulus of the calculation. The modulus can be a long integer or another bigReals integer:
+Below you could find the differences between the last released version of bigReals and the past one:
 
-    var bigInteger = require('bigreals').integers;
+#### 0.6.0
 
-    var op = bigInteger(234);
-    var modulus = bigInteger(5);
-
-    console.log(op.add(50, 5));
-    console.log(op.add(50, modulus));
-
-All the calculations return another bigReals integer as a result, so operations can be chained:
-
-
-    var bigInteger = require('bigreals').integers;
-
-    var op1 = bigInteger(234);
-    var op2 = bigInteger(45);
-    var modulus = bigInteger(5);
-
-    console.log(op1.add(50, 5).mul(op2, modulus).pow(5));
+*   Added irrationals support using MPFR
+*   Rearranged folder structure
+*   Added irrationals and integers manual
+*   Added test for irrationals functions
 
 ***
-Next: [Essential arithmetics](#arithmetics)&nbsp;&nbsp;&nbsp;Previous: [Modular arithmetics](#modular)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
+Next: [License](#license)&nbsp;&nbsp;&nbsp;Previous: [Changelog](#changelog)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
 
-###<a name="arithmetics">Essential arithmetics</a>
+###<a name="license">License</a>
 
-BigReals integers allows for basic arithmetics such as addition(function **add**), substraction(function **sub**), multiplication(function **mul**) and
-exponentiation(function **pow**). All the functions follow the same pattern, a long integer or another bigReal integer can be supplied as arguments together
-with an optional modulus to convert the calculation into a modular one. Modulus can be a long integer or another bigReals integer:
+(The MIT License)
 
-    var bigInteger = require('bigreals').integers;
-    
-    var op1 = bigInteger(240560);
-    var op2 = bigInteger(50000343433);
-    var mod = bigInteger(50);
-     
-    console.log(op1.add(20));
-    console.log(op1.mul(op2, mod));
-    console.log(op3.pow(100);
-    console.log(op3.pow(op1, 5));
+Copyright (c) 2013 David Fernández Madrid <david.fdmv@gmail.com>
 
-Besides that, bigReals integers support calculations like n-th roots and divisions that can raise a non-integer value through **root** and **div** functions.
-If the first argument passed is a long integer, a n-th root or division will be calculated rounding result to nearest or equal integer(ceil). In case is
-a bigReals integer, it will be used to store the remainder of the calculation. In both cases, an optional long integer or bigReals integer last argument
-taken as modulus could be supplying to execute a modular calculation.
-    
-    var bigInteger = require('bigreals').integers;
-    
-    var op1 = bigInteger(36);
-    var op2 = bigInteger(50);
-    var mod = bigInteger(5);
-    var remainder = bigInteger();
- 
-    console.log(op1.root(6));
-    console.log(op1.root(6, mod));
-    console.log(op2.div(remainder, 3));
-    console.log(op2.div(op1, 5));
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'),
+to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+IN THE SOFTWARE.
     
 ***
-Next: [Logical and bit-wise functions](#logical)&nbsp;&nbsp;&nbsp;Previous: [Essential arithmetics](#arithmetics)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
+Next: [Compatibility](#compatibility)&nbsp;&nbsp;&nbsp;Previous: [License](#license)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
 
-###<a name="logical">Logical and bit-wise functions</a>
+###<a name="compatibility">Compatibility</a>
 
-BigReals integers aims at providing a powerful interface for dealing with bit/byte calculations. Basic logical calculations like xor, AND, OR are supported
-through **exor**, **and** and **or** functions. All those functions could be passed a long integer or another bigReals integer as operand:
+BigReals has been tested with *gmp* version 5.0.5 and *mpfr* version 4.0 in Ubuntu Linux 64bits, but should compile and work in other systems,
+either 32 or 64bits in Windows, Linux or Apple platforms.
 
-    var bigInteger = require('bigreals').integers;
-    
-    var op1 = bigInteger(36);
-    var op2 = bigInteger(50);
-    var op3 = bigInteger(5);
- 
-    console.log(op1.exor(6));
-    console.log(op1.and(op2));
-    console.log(op1.or(8));
-
-Besides that, logical left shift and right shift calculations can be executed by calling **lshift** and **rshift** functions with a long integer or bigReals
-integer operand representing the number of positions/powers of 2 to shift. Optionally, a long integer or bigReals integer could be passed as modulus as
-in fact, those operations are a multiplication and a division by a power of 2 respectively:
-
-    var bigInteger = require('bigreals').integers;
-    
-    var op1 = bigInteger(36);
-    var op2 = bigInteger(50);
-    var op3 = bigInteger(5);
- 
-    console.log(op1.lshift(6));
-    console.log(op1.lshift(op3));
-    console.log(op2.rshift(3));
-
-To calculate the Hamming distance between a bigReal integer and a long integer or another bigReal integer, you can use the **hammingDist** function, which
-will return the number of bit positions with different values of the two operands:
-
-    var bigInteger = require('bigreals').integers;
-    
-    var op1 = bigInteger(36);
-    var op2 = bigInteger(50);
- 
-    console.log(op1.hammingDist(6));
-    console.log(op1.hammingDist(op2));
-
-To obtain the number of bits sets to 1 in a bigReal integer, you can use the **population** function called with no arguments:
-
-
-    var bigInteger = require('bigreals').integers;
-    
-    var op1 = bigInteger(36);
- 
-    console.log(op1.population());
-
-In the next version of bigReals, logical functions will be extended to allow the user to optionally operate only on a specific bit or byte.
+If you find problems or bugs compiling or using bigReals in other systems or with other versions of *gmp* or *mpfr* installed, please open an
+issue in GitHub's [bigReals project repository](https://github.com/dfmadrid/bigreals).
     
 ***
-Next: [Comparison functions](#comparison)&nbsp;&nbsp;&nbsp;Previous:[Logical and bit-wise functions](#logical)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
+Next: [Installation](#installation)&nbsp;&nbsp;&nbsp;Previous:[Compatibility](#compatibility)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
 
-###<a name="comparison">Comparison functions</a>
+###<a name="installation">Installation</a>
 
 A bigReals integer could be compared with a long integer or another bigReals integer with the **cmp** function, which will return 0 if both numbers
 are equal, >0 if the argument is smaller or <0 if bigger:
@@ -171,9 +86,9 @@ are equal, >0 if the argument is smaller or <0 if bigger:
     console.log(op2.cmp(op1));
     console.log(op1.cmp(op2);
 
-Next: [Combo functions](#combos)&nbsp;&nbsp;&nbsp;Previous:[Comparison functions](#comparison)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
+Next: [Basic usage](#basics)&nbsp;&nbsp;&nbsp;Previous:[Installation](#installation)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
 
-###<a name="combos">Combo functions</a>
+###<a name="basics">Basic usage</a>
 
 BigReals combo functions execute several calculations in C/C++ before returning the result to NodeJS, which results in fast calculations mainly
 targeted to be executed inside loops. Besides that, all combo functions will add the result of the calculation to the existing value of the
