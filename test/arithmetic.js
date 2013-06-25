@@ -13,15 +13,15 @@ var op3 = bigReal(9);
 var remainder = bigReal(1);
 
 var getRootRem = function(base, root){
-	base.root(remainder, root);
-	return remainder;
-	}
+  base.root(remainder, root);
+  return remainder;
+  }
 
 var getDivRem = function(dividend, remainder, divisor){
-	dividend.div(remainder, divisor);
-	return remainder;
-	}
-	
+  dividend.div(remainder, divisor);
+  return remainder;
+  }
+  
 console.log("Arithmetic tests:\n");
 
 assert.equal('12', op1.mul(2).toString());

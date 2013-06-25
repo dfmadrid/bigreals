@@ -13,7 +13,7 @@ console.log("Initialization tests:\n");
 
 assert.equal('0', bigReal().toString());
 console.log('0 = ' + bigReal(0) + " -- Ok");
-	
+  
 assert.equal('3', bigReal(3).toString());
 console.log('3 = ' + bigReal(3) + " -- Ok");
 
