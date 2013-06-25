@@ -66,8 +66,8 @@ Next: [Essential arithmetics](#arithmetics)&nbsp;&nbsp;&nbsp;Previous: [Modular 
 
 ###<a name="arithmetics">Essential arithmetics</a>
 
-BigReals integers allows for basic arithmetics such as addition(**add** function), substraction(**sub** function), multiplication(**mul** function) and
-exponentiation(**pow**). All the functions follow the same pattern, a long integer or another bigReal integer can be supplied as arguments together
+BigReals integers allows for basic arithmetics such as addition(function **add**), substraction(function **sub**), multiplication(function **mul**) and
+exponentiation(function **pow**). All the functions follow the same pattern, a long integer or another bigReal integer can be supplied as arguments together
 with an optional modulus to convert the calculation into a modular one. Modulus can be a long integer or another bigReals integer:
 
     var bigInteger = require('bigreals').integers;
