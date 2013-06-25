@@ -7,12 +7,14 @@
 using namespace v8;
 
 Handle<Value> factory(const Arguments& args) {
+
   HandleScope scope;
 
   return scope.Close(bigInt::NewInstance(args));
 }
 
 void InitAll(Handle<Object> exports, Handle<Object> module) {
+
   bigInt::Init();
 
   module->Set(String::NewSymbol("exports"),
@@ -20,4 +22,4 @@ void InitAll(Handle<Object> exports, Handle<Object> module) {
 
 }
 
-NODE_MODULE(intFactory, InitAll)
+NODE_MODULE(bigIntegers, InitAll)

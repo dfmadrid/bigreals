@@ -147,7 +147,7 @@ base is a mandatory argument:
     console.log(op2);
     console.log(op3);
 
-Irrationals are composed of decimal numbers plus special numbers like log2*, *Pi*, *Euler*'s and *Catalan*'s constants, so bigReals
+Irrationals are composed of decimal numbers plus special numbers like *log2*, *Pi*, *Euler*'s and *Catalan*'s constants, so bigReals
 supports initialization to any of those constants with an optional precision and rounding mode:
 
     var bigReals = require('bigreals');

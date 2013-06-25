@@ -51,6 +51,8 @@ void bigReal::Init() {
     FunctionTemplate::New(inspect)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("toString"),
     FunctionTemplate::New(toString)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("print"),
+    FunctionTemplate::New(print)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("precision"),
     FunctionTemplate::New(precision)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("rMode"),
@@ -393,6 +395,38 @@ Handle<Value> bigReal::toString(const Arguments& args) {
   }
   
   return scope.Close(String::New(realValue.c_str()));
+}
+
+/* Prints a string representing the bigReal number to the specified stream.
+ * If no stream is supplied, it will print to standard output.
+ * Optionally a string base between 2 and 62, an optional number of most significant digits to
+ * print and rounding mode could be provided.
+ * If no base is provided, base 10 is assumed. If no number of digits is provided, MPFR will print
+ * the number of most significant digits needed to exactly convert back the string to the same bigReal
+ * number rounding to the nearest.
+ */
+
+Handle<Value> bigReal::print(const Arguments& args) {
+
+  HandleScope scope;
+  bigReal *obj = ObjectWrap::Unwrap<bigReal>(args.This());
+  int base;
+  size_t numBytes;
+  mpfr_rnd_t rMode;
+  FILE * stream = NULL;
+  
+  base = getOpArg(1, "Base", args, Uint32::New(10))->Uint32Value();
+  numBytes = (size_t) getOpArg(2, "Number of Digits", args, Uint32::New(0))->Uint32Value();
+  rMode = (mpfr_rnd_t) getOpArg(3, "Rounding Mode", args, Uint32::New(obj->rMode_))->Uint32Value();
+    
+  if(args[0]->IsExternal()){
+    stream = (FILE *) External::Unwrap(args[0]);
+  }
+  else{
+    mpfr_out_str(stream, base, numBytes, *obj->mpFloat_, rMode);
+  }
+  
+  return scope.Close(Undefined());
 }
 
 /* Gets or sets the precision of the bigReal Irrational number.

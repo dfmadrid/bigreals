@@ -5,6 +5,7 @@
 #define BIGINT_H
 
 #include <node.h>
+#include <stdio.h>
 #include <gmp.h>
 
 class bigInt : public node::ObjectWrap {

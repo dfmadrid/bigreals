@@ -22,4 +22,4 @@ void InitAll(Handle<Object> exports, Handle<Object> module) {
  
 }
 
-NODE_MODULE(realsFactory, InitAll)
+NODE_MODULE(bigReals, InitAll)

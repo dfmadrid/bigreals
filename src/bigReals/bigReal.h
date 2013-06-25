@@ -1,11 +1,12 @@
 #ifndef BUILDING_NODE_EXTENSION
 #define BUILDING_NODE_EXTENSION
 #endif
-#ifndef BIGFLOAT_H
-#define BIGFLOAT_H
+#ifndef BIGREAL_H
+#define BIGREAL_H
 
 #include <node.h>
 #include <gmp.h>
+#include <stdio.h>
 #include <mpfr.h>
 
 // Defaults config class
@@ -35,6 +36,7 @@ class bigReal : public node::ObjectWrap {
 		static v8::Handle<v8::Value> New(const v8::Arguments& args);
 		static v8::Handle<v8::Value> inspect(const v8::Arguments& args);
 		static v8::Handle<v8::Value> toString(const v8::Arguments& args);
+		static v8::Handle<v8::Value> print(const v8::Arguments& args);
 		static v8::Handle<v8::Value> precision(const v8::Arguments& args);
 		static v8::Handle<v8::Value> rMode(const v8::Arguments& args);
 		static v8::Handle<v8::Value> add(const v8::Arguments& args);

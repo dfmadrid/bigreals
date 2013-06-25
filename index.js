@@ -6,10 +6,10 @@
  * a mpfr big floating point depending on user supplied input
 */
 
-var bigInteger = require("./build/Release/bigIntegers");
-var bigReal = require("./build/Release/bigReals");
+var bigIntegers = require("./build/Release/bigIntegers");
+var bigReals = require("./build/Release/bigReals");
 
-module.exports = bigReal;
-module.exports.integer = bigInteger;
-module.exports.defaults = bigReal().defaults;
+module.exports = bigReals;
+module.exports.integers = bigIntegers;
+module.exports.defaults = bigReals().defaults;
 
