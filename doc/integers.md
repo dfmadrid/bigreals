@@ -50,13 +50,24 @@ modulus of the calculation. The modulus can be a long integer or another bigReal
     console.log(op.add(50, 5));
     console.log(op.add(50, modulus));
 
+All the calculations return another bigReals integer as a result, so operations can be chained:
+
+
+    var bigInteger = require('bigreals').integers;
+
+    var op1 = bigInteger(234);
+    var op2 = bigInteger(45);
+    var modulus = bigInteger(5);
+
+    console.log(op1.add(50, 5).mul(op2, modulus).pow(5));
+
 ***
 Next: [Essential arithmetics](#arithmetics)&nbsp;&nbsp;&nbsp;Previous: [Modular arithmetics](#modular)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
 
 ###<a name="arithmetics">Essential arithmetics</a>
 
-BigReals integers allows for basic arithmetics such as addition(*add* function), substraction(*sub* function), multiplication(*mul* function) and
-exponentiation(*pow*). All the functions follow the same pattern, a long integer or another bigReal integer can be supplied as arguments together
+BigReals integers allows for basic arithmetics such as addition(**add** function), substraction(**sub** function), multiplication(**mul** function) and
+exponentiation(**pow**). All the functions follow the same pattern, a long integer or another bigReal integer can be supplied as arguments together
 with an optional modulus to convert the calculation into a modular one. Modulus can be a long integer or another bigReals integer:
 
     var bigInteger = require('bigreals').integers;
@@ -70,7 +81,7 @@ with an optional modulus to convert the calculation into a modular one. Modulus 
     console.log(op3.pow(100);
     console.log(op3.pow(op1, 5));
 
-Besides that, bigReals integers support calculations like n-th roots and divisions that can raise a non-integer value through *root* and *div* functions.
+Besides that, bigReals integers support calculations like n-th roots and divisions that can raise a non-integer value through **root** and **div** functions.
 If the first argument passed is a long integer, a n-th root or division will be calculated rounding result to nearest or equal integer(ceil). In case is
 a bigReals integer, it will be used to store the remainder of the calculation. In both cases, an optional long integer or bigReals integer last argument
 taken as modulus could be supplyind to execute a modular calculation.
@@ -94,7 +105,7 @@ Next: [Logical and bit-wise functions](#logical)&nbsp;&nbsp;&nbsp;Previous: [Ess
 ###<a name="logical">Logical and bit-wise functions</a>
 
 BigReals integers aims at providing a powerful interface for dealing with bit/byte calculations. Basic logical calculations like xor, AND, OR are supported
-through *exor*, *and* and *or* functions. All those functions could be passed a long integer or another bigReals integer as operand:
+through **exor**, **and** and **or** functions. All those functions could be passed a long integer or another bigReals integer as operand:
 
     var bigInteger = require('bigreals').integers;
     
@@ -106,7 +117,7 @@ through *exor*, *and* and *or* functions. All those functions could be passed a 
     console.log(op1.and(op2));
     console.log(op1.or(8));
 
-Besides that, logical left shift and right shift calculations can be executed by calling *lshift* and *rshift* functions with a long integer or bigReals
+Besides that, logical left shift and right shift calculations can be executed by calling **lshift** and **rshift** functions with a long integer or bigReals
 integer operand representing the number of positions/powers of 2 to shift. Optionally, a long integer or bigReals integer could be passed as modulus as
 in fact, those operations are a multiplication and a division by a power of 2 respectively:
 
@@ -119,6 +130,26 @@ in fact, those operations are a multiplication and a division by a power of 2 re
     console.log(op1.lshift(6));
     console.log(op1.lshift(op3));
     console.log(op2.rshift(3));
+
+To calculate the Hamming distance between a bigReal integer and a long integer or another bigReal integer, you can use the **hammingDist** function, which
+will return the number of bit positions with different values of the two operands:
+
+    var bigInteger = require('bigreals').integers;
+    
+    var op1 = bigInteger(36);
+    var op2 = bigInteger(50);
+ 
+    console.log(op1.hammingDist(6));
+    console.log(op1.hammingDist(op2));
+
+To obtain the number of bits sets to 1 in a bigReal integer, you can use the **population** function called with no arguments:
+
+
+    var bigInteger = require('bigreals').integers;
+    
+    var op1 = bigInteger(36);
+ 
+    console.log(op1.population());
 
 In the next version of bigReals, logical functions will be extended to allow the user to optionally operate only on a specific bit or byte.
     
