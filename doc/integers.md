@@ -8,7 +8,6 @@ This chapter discusses the special interface of BigReals to GMP and how to use i
 *   [Initialization](#initialization)
 *   [Modular arithmetics](#modular)
 *   [Essential arithmetics](#arithmetics)
-*   [Roots and divisions](#rootsdivs)
 *   [Logical and bit-wise functions](#logical)
 *   [Comparison functions](#comparison)
 *   [Combo functions](#combos)
@@ -56,49 +55,43 @@ Next: [Essential arithmetics](#arithmetics)&nbsp;&nbsp;&nbsp;Previous: [Modular 
 
 ###<a name="arithmetics">Essential arithmetics</a>
 
-A bigReals irrational number can be initialized with a long integer value, a double value or a string and optionally a precision and
-rounding mode. In the case of double values, you can use dot notation or floating point notation:
+BigReals integers allows for basic arithmetics such as addition(*add* function), substraction(*sub* function), multiplication(*mul* function) and
+exponentiation(*pow*). All the functions follow the same pattern, a long integer or another bigReal integer can be supplied as arguments together
+with an optional modulus to convert the calculation into a modular one. Modulus can be a long integer or another bigReals integer:
 
-    var bigReals = require('bigreals');
-    var op1 = bigReals(4.04324324, 32, 3);
-    var op2 = bigReals(655e-2, 24);
-    var op3 = bigReals(45050003);
-     
-    console.log(op1);
-    console.log(op2);
-    console.log(op3);
-
-In the case of strings, any string representing a number could be provided, the only limit is the memory available in your system. Optionally
-a base of the string representation could be provided. To specify a precision and/or rounding mode for the BigReal irrational number, the
-base is a mandatory argument:
-
-    var bigReals = require('bigreals');
-    var op1 = bigReals("312321785473984758923758943759843759438753984753984753894754398759834759834759", 10, 5000);
-    var op2 = bigReals("3f45665bac.45fbae3d", 16);
-    var op3 = bigReals("4.5050003", 10, 32, 3);
-
-    console.log(op1);
-    console.log(op2);
-    console.log(op3);
-
-Irrationals are composed of decimal numbers plus special numbers like *log2*, *Pi*, *Euler*'s and *Catalan*'s constants, so bigReals
-supports initialization to any of those constants with an optional precision and rounding mode:
-
-    var bigReals = require('bigreals');
-    var pi = bigReals("Pi", 100);
-    var cat = bigReals("Catalan");
-    var euler = bigReals("Euler");
-    var log2 = bigReals("log2);
+    var bigInteger = require('bigreals').integers;
     
-    console.log(pi);
-    console.log(cat);
-    console.log(euler);
-    console.log(log2);
+    var op1 = bigInteger(240560);
+    var op2 = bigInteger(50000343433);
+    var mod = bigInteger(50);
+     
+    console.log(op1.add(20));
+    console.log(op1.mul(op2, mod));
+    console.log(op3.pow(100);
+    console.log(op3.pow(op1, 5));
+
+Besides that, bigReals integers support calculations like n-th roots and divisions that can raise a non-integer value through *root* and *div* functions.
+If the first argument passed is a long integer, a n-th root or division will be calculated rounding result to nearest or equal integer(ceil). In case is
+a bigReals integer, it will be used to store the remainder of the calculation. In both cases, an optional long integer or bigReals integer last argument
+taken as modulus could be supplyind to execute a modular calculation.
+    
+    var bigInteger = require('bigreals').integers;
+    
+    var op1 = bigInteger(36);
+    var op2 = bigInteger(50);
+    var mod = bigInteger(5);
+    var remainder = bigInteger();
+ 
+    console.log(op1.root(6));
+    console.log(op1.root(6, mod));
+    console.log(op2.div(remainder, 3));
+    console.log(op2.div(op1, 5));
+
     
 ***
-Next: [Essential arithmetics](#arithmetics)&nbsp;&nbsp;&nbsp;Previous: [Exponentiation, roots and logarithms](#logexp)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
+Next: [Logical and bit-wise functions](#logical)&nbsp;&nbsp;&nbsp;Previous: [Essential arithmetics](#arithmetics)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
 
-###<a name="arithmetics">Essential arithmetics</a>
+###<a name="logical">Logical and bit-wise functions</a>
 
 BigReals supports basic arithmetic calculations like addition(function **add**), substracction(function **sub**), multiplication(function **mul**),
 and division(function **div**).
