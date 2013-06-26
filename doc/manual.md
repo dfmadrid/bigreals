@@ -67,6 +67,7 @@ Installation in Windows platforms in equally simple and requires the same steps 
 
 Please check **node-gyp** [project's page](https://github.com/TooTallNate/node-gyp) for more details and troubleshooting.
 
+***
 Next: [Basic usage](#basics)&nbsp;&nbsp;&nbsp;Previous:[Installation](#installation)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
 
 ###<a name="basics">Basic usage</a>
