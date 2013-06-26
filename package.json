@@ -1,6 +1,6 @@
 {
     "name" : "bigReals",
-    "version" : "0.7.0",
+    "version" : "0.6.0",
     "description" : "Calculations and bit manipulations over big integers and big Irrationals using gnu's gmp and mpfr",
     "main" : "./index.js",
     "repository" : {
