@@ -8,7 +8,7 @@ In a nutshell, bigReals offers the following features:
 
    * Easy and fast modular arithmetics.
    * Comprehensive trigonometric, exponentiation and logarithm functions.
-   * Special numbers support(NaN, Infinity, Pi, Euler's and Catalan's constants ...).
+   * Special numbers support(NaN, Infinity, log2, Pi, Euler's and Catalan's constants).
    * Loop optimized functions to speed up calculation from Javascript.
    * Precision of irrationals calculations is chosen based on the highest between the operand's precision if none is provided as argument.
 
@@ -18,22 +18,14 @@ new functions and improvements will be added in future versions.
 
 Installation
 ------------
-bigReals has been tested on Linux, but should compile and work fine in Windows or Mac provided [gmp](http://gmplib.org/) and
-[mpfr](http://www.mpfr.org) sources are installed. To install gmp's sources on Ubuntu Linux:
-
-    $ sudo apt-get install libgmp-dev
-
-If you run a linux distribution, is quite likely you already have installed mpfr in your system, you could check it with the
-following command:
-
-    $ locate mpfr.h
-
-While a npm package is created, you can install bigReals cloning from github:
+An *npm* package will be created when bigReals arrives to version 1.0. Meanwhile, you can install bigReals cloning from github:
 
     $ cd node_modules
     $ git clone git://github.com/dfmadrid/bigreals.git
     $ cd bigreals
     $ npm install
+
+Check the [documentation](doc/manual.md) for more info about compatibility and installation in the different platforms.
 
 Testing
 -------
@@ -47,63 +39,18 @@ To run a specific test, execute it with node:
 
 Documentation
 -------------
-Documentation will follow soon. Meanwhile, check tests for guiding about usage.
+Under folder *doc* you could find the [bigReals manual](doc/manual.md) with a complete description of bigReals interface and many basic examples.
+bigReals source code is verboselly commented as well to favour collaboration in development.
 
 Examples
 --------
-Normal and modular arithmetics:
-
-    var bigReal = require('bigreals');
-    
-    var op1 = bigReal(20);
-    var op2 = bigReal(30);
-    var mod = bigReal(3);
-
-    console.log(op1.add(op2).toString());       // 20 + 30 = 50
-    console.log(op1.mul(2, mod).toString());    // 20 * 2 mod 3 = 1
-
-Integer roots with or without remainder:
-
-    var bigReal = require('bigreals');
-    
-    var op = bigReal(30);
-    var mod = bigReal(3);
-    var remainder = bigReal(1);
-    console.log(op.root(3).toString());        // 30 ^ 1/3 = 3 (truncated)
-    var result = op.root(remainder, 3);             // 30 ^ 1/3 = 3
-    console.log(remainder.add(result.pow(3)).toString());  // 3 + 3 ^ 3 = 30
-
-Hash table creation and lookup using special loop-optimized functions:
-
-    var bigReal = require('bigreals');
-    
-    var op1 = bigReal(20);
-    var op2 = bigReal(30);
-    var op3 = bigReal("500");
-    var hashTable = {};
-    var cont = 0;
-
-    while(cont < 100){
-     hashTable[op1.accMul(3).toString(16)] = op2.sub(op3).toString();    // op1.accMul(3) -> op1 = op1 * 3;
-     cont++;
-     }
-
-    cont = 0;
-    var value = "21d20f70b1835f3560511394";
-
-    while(cont < 100){
-     if(hashTable[value]){
-      console.log(hashTable[value]);                // Value of hash 21d20f70b1835f3560511394 is -470
-	    cont = 100;
-	}
-      cont++;
-    }
+Under folder *examples* you could find more ellaborated examples of bigReal number usage like hash table creation and lookup.
 
 Contributions
 -------------
 If you have any idea, performance improvement or function missing particularly related to cryptography or number theory that
-would be interesting to have included in bigReals, send an email to &lt;david.fdmv@gmail.com&gt; or open a pull request in
-Github. If you find a bug, please open an issue on Github with the steps to reproduce it.
+would be interesting to have included in bigReals, open a pull request in Github. If you find a bug, please open an issue on
+Github with the steps to reproduce it.
 
 License
 -------
