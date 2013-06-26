@@ -50,16 +50,7 @@ modulus of the calculation. The modulus can be a long integer or another bigReal
     console.log(op.add(50, 5));
     console.log(op.add(50, modulus));
 
-All the calculations return another bigReals integer as a result, so operations can be chained:
 
-
-    var bigInteger = require('bigreals').integers;
-
-    var op1 = bigInteger(234);
-    var op2 = bigInteger(45);
-    var modulus = bigInteger(5);
-
-    console.log(op1.add(50, 5).mul(op2, modulus).pow(5));
 
 ***
 Next: [Essential arithmetics](#arithmetics)&nbsp;&nbsp;&nbsp;Previous: [Modular arithmetics](#modular)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
@@ -98,6 +89,25 @@ taken as modulus could be supplying to execute a modular calculation.
     console.log(op2.div(remainder, 3));
     console.log(op2.div(op1, 5));
 
+To calculate the inverse of a bigReal number, the **invert** function is used, called with an optional long integer or bigReal integer as modulus:
+
+    var bigInteger = require('bigreals').integers;
+
+    var op = bigInteger(50);
+    var mod = bigInteger(3);
+
+    console.log(op.invert());
+    console.log(op.invert(mod));
+
+All the calculations return another bigReals integer as a result, so operations can be chained:
+
+    var bigInteger = require('bigreals').integers;
+
+    var op1 = bigInteger(234);
+    var op2 = bigInteger(45);
+    var modulus = bigInteger(5);
+
+    console.log(op1.add(50, 5).mul(op2, modulus).pow(5));
     
 ***
 Next: [Logical and bit-wise functions](#logical)&nbsp;&nbsp;&nbsp;Previous: [Essential arithmetics](#arithmetics)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
@@ -131,7 +141,7 @@ in fact, those operations are a multiplication and a division by a power of 2 re
     console.log(op1.lshift(op3));
     console.log(op2.rshift(3));
 
-To calculate the Hamming distance between a bigReal integer and a long integer or another bigReal integer, you can use the **hammingDist** function, which
+To calculate the Hamming distance between a bigReal integer and a long integer or another bigReal integer, you can use the **hamDist** function, which
 will return the number of bit positions with different values of the two operands:
 
     var bigInteger = require('bigreals').integers;
@@ -139,8 +149,8 @@ will return the number of bit positions with different values of the two operand
     var op1 = bigInteger(36);
     var op2 = bigInteger(50);
  
-    console.log(op1.hammingDist(6));
-    console.log(op1.hammingDist(op2));
+    console.log(op1.hamDist(6));
+    console.log(op1.hamDist(op2));
 
 To obtain the number of bits sets to 1 in a bigReal integer, you can use the **population** function called with no arguments:
 
@@ -170,6 +180,7 @@ are equal, >0 if the argument is smaller or <0 if bigger:
     console.log(op2.cmp(op1));
     console.log(op1.cmp(op2);
 
+***
 Next: [Combo functions](#combos)&nbsp;&nbsp;&nbsp;Previous:[Comparison functions](#comparison)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
 
 ###<a name="combos">Combo functions</a>

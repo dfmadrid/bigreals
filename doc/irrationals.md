@@ -363,6 +363,28 @@ an optional precision and rounding mode could be provided and in the case of **a
     console.log(op2.fac(100));
     console.log(op3.abs());
 
+To print a bigReals number, you could use **toString** and **print** functions. If called with no arguments or with an optional string base, **toString** will
+return a string in the specified base(or base 10 if none is provided) representing the bigReals number with the number of digits and precision needed by
+biReals to convert back the string exactly to the same bigReal number. If a number of digits is provided as second argument and an optional rounding mode is provided
+as third, it will return a string in the specified base with the specified number of most significant digits rounded in the specified roundin mode:
+
+    var bigReals = require('bigreals');
+
+    var op = bigReal(23423423.432432432423423);
+
+    console.log(op.toString());
+    console.log(op.toString(16));
+    console.log(op.toString(10, 32));
+
+To print to a stream, the **print** function could be used with a similar arguments patterns than **toString** except for a stream to print to as first argument.
+If no stream is provided as argument, it will print to standard output:
+
+    var bigReals = require('bigreals');
+
+    var op = bigReal("43dfa.45cba34522", 16));
+
+    op.print();
+    op.print(16, 8);
 
 ***
 Previous: [Other functions](#other)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)&nbsp;&nbsp;&nbsp;Up: [BigReals manual](manual.md)
