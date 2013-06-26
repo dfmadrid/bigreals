@@ -79,7 +79,7 @@ numbers using **gmp**. To create a bigReals number, just call the appropiate fac
     var bigreal = require('bigreals');
 
     var op1 = bigreal("Pi", 100);
-    var op2 = biginteger(1223435345465656767678678768988879789789789879879);
+    var op2 = biginteger("1223435345465656767678678768988879789789789879879");
 
     console.log(op1);			
     console.log(op2);
