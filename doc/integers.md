@@ -207,6 +207,8 @@ inside loops, speeding up the calculation even more.
 ***
 Next: [Other functions](#other)&nbsp;&nbsp;&nbsp;Previous: [Combo functions](#combos)&nbsp;&nbsp;&nbsp;Top: [Contents](#contents)
 
+###<a name="other">Other functions</a>
+
 To obtain a string representing the bigReals integer, function **toString** could be used with an optinal string base between 2 and 62
 as argument. If no base is provided, base 10 is assumed:
 
